@@ -94,6 +94,8 @@ public:
 
   friend std::ostream & operator<< (std::ostream & os, FlonaseOptionSack const & sackOption);
 
+  friend std::ostream & operator<< (std::ostream & os, FlonaseOptionSack::SackBlock const & sackBlock);
+
 protected:
   SackList m_sackList; //!< the list of SACK blocks
 };
@@ -106,16 +108,37 @@ protected:
  */
 std::ostream & operator<< (std::ostream & os,
                            FlonaseOptionSack const & sackOption);
-
-/**
- * \brief Output operator.
- * \param os The output stream.
- * \param sackBlock the block to print.
- * \returns The output stream.
- */
+//
+// /**
+//  * \brief Output operator.
+//  * \param os The output stream.
+//  * \param sackBlock the block to print.
+//  * \returns The output stream.
+//  */
 std::ostream & operator<< (std::ostream & os,
                            FlonaseOptionSack::SackBlock const & sackBlock);
+inline std::ostream &
+operator<< (std::ostream & os, FlonaseOptionSack const & sackOption)
+{
+ std::stringstream ss;
+ ss << "{";
+ for (auto it = sackOption.m_sackList.begin (); it != sackOption.m_sackList.end (); ++it)
+   {
+     ss << *it;
+   }
+ ss << "}";
+ os << ss.str ();
+ return os;
+}
 
+inline std::ostream &
+operator<< (std::ostream & os, FlonaseOptionSack::SackBlock const & sackBlock)
+{
+ std::stringstream ss;
+ ss << "[" << sackBlock.first << ";" << sackBlock.second << "]";
+ os << ss.str ();
+ return os;
+}
 } // namespace ns3
 
 #endif /* FLONASE_OPTION_SACK */

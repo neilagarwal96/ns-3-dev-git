@@ -94,6 +94,10 @@ public:
 
   friend std::ostream & operator<< (std::ostream & os, TcpOptionSack const & sackOption);
 
+  friend std::ostream & operator<< (std::ostream & os,
+                             TcpOptionSack::SackBlock const & sackBlock);
+
+
 protected:
   SackList m_sackList; //!< the list of SACK blocks
 };
@@ -115,6 +119,29 @@ std::ostream & operator<< (std::ostream & os,
  */
 std::ostream & operator<< (std::ostream & os,
                            TcpOptionSack::SackBlock const & sackBlock);
+
+inline std::ostream &
+operator<< (std::ostream & os, TcpOptionSack const & sackOption)
+{
+  std::stringstream ss;
+  ss << "{";
+  for (auto it = sackOption.m_sackList.begin (); it != sackOption.m_sackList.end (); ++it)
+    {
+      ss << *it;
+    }
+  ss << "}";
+  os << ss.str ();
+  return os;
+}
+
+inline std::ostream &
+operator<< (std::ostream & os, TcpOptionSack::SackBlock const & sackBlock)
+{
+  std::stringstream ss;
+  ss << "[" << sackBlock.first << ";" << sackBlock.second << "]";
+  os << ss.str ();
+  return os;
+}
 
 } // namespace ns3
 

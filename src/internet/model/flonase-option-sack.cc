@@ -156,27 +156,4 @@ FlonaseOptionSack::GetSackList (void) const
   return m_sackList;
 }
 
-std::ostream &
-operator<< (std::ostream & os, FlonaseOptionSack const & sackOption)
-{
-  std::stringstream ss;
-  ss << "{";
-  for (auto it = sackOption.m_sackList.begin (); it != sackOption.m_sackList.end (); ++it)
-    {
-      ss << *it;
-    }
-  ss << "}";
-  os << ss.str ();
-  return os;
-}
-
-std::ostream &
-operator<< (std::ostream & os, FlonaseOptionSack::SackBlock const & sackBlock)
-{
-  std::stringstream ss;
-  ss << "[" << sackBlock.first << ";" << sackBlock.second << "]";
-  os << ss.str ();
-  return os;
-}
-
 } // namespace ns3
