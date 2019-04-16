@@ -206,9 +206,9 @@ TraceNextRx (std::string &next_rx_seq_file_name)
 
 int main (int argc, char *argv[])
 {
-  std::string transport_prot = "TcpWestwood";
+  std::string transport_prot = "TcpNewReno";
   double error_p = 0.0;
-  std::string bandwidth = "2Mbps";
+  std::string bandwidth = "1Mbps";
   std::string delay = "0.01ms";
   std::string access_bandwidth = "10Mbps";
   std::string access_delay = "45ms";
@@ -217,9 +217,9 @@ int main (int argc, char *argv[])
   uint64_t data_mbytes = 0;
   uint32_t mtu_bytes = 400;
   uint16_t num_flows = 1;
-  double duration = 100.0;
+  double duration = 30.0;
   uint32_t run = 0;
-  bool flow_monitor = false;
+  bool flow_monitor = true;
   bool pcap = false;
   bool sack = true;
   std::string queue_disc_type = "ns3::PfifoFastQueueDisc";
@@ -229,7 +229,7 @@ int main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("transport_prot", "Transport protocol to use: TcpNewReno, "
                 "TcpHybla, TcpHighSpeed, TcpHtcp, TcpVegas, TcpScalable, TcpVeno, "
-                "TcpBic, TcpYeah, TcpIllinois, TcpWestwood, TcpWestwoodPlus, TcpLedbat, "
+                "TcpBic, TcpYeah, TcpIllinois, TcpWestwood, TcpWestwoodPlus, TcpLedbat, TcpDecongest"
 		"TcpLp", transport_prot);
   cmd.AddValue ("error_p", "Packet error rate", error_p);
   cmd.AddValue ("bandwidth", "Bottleneck bandwidth", bandwidth);
@@ -249,6 +249,8 @@ int main (int argc, char *argv[])
   cmd.AddValue ("sack", "Enable or disable SACK option", sack);
   cmd.AddValue ("recovery", "Recovery algorithm type to use (e.g., ns3::TcpPrrRecovery", recovery);
   cmd.Parse (argc, argv);
+
+  NS_LOG_UNCOND(transport_prot);
 
   transport_prot = std::string ("ns3::") + transport_prot;
 
@@ -285,7 +287,7 @@ int main (int argc, char *argv[])
                       TypeIdValue (TypeId::LookupByName (recovery)));
   // Select TCP variant
   if (transport_prot.compare ("ns3::TcpWestwoodPlus") == 0)
-    { 
+    {
       // TcpWestwoodPlus is not an actual TypeId name; we need TcpWestwood here
       Config::SetDefault ("ns3::TcpL4Protocol::SocketType", TypeIdValue (TcpWestwood::GetTypeId ()));
       // the default protocol type in ns3::TcpWestwood is WESTWOOD

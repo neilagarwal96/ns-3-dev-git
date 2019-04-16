@@ -66,7 +66,7 @@ def configure(conf):
         conf.report_optional_feature("nsc", "Network Simulation Cradle", False,
                                      "NSC not found (see option --with-nsc)")
         return
-    
+
     if Utils.unversioned_sys_platform() in ['linux', 'freebsd']:
         arch = os.uname()[4]
     else:
@@ -78,7 +78,7 @@ def configure(conf):
         conf.check_nonfatal(mandatory=True, lib='dl', define_name='HAVE_DL', uselib_store='DL')
         ok = True
     conf.msg('Checking for NSC supported architecture ' + (arch or ''), ok)
-    
+
     if not ok:
         conf.env['NSC_ENABLED'] = False
         conf.report_optional_feature("nsc", "Network Simulation Cradle", False,
@@ -150,9 +150,10 @@ def build(bld):
         'model/tcp-highspeed.cc',
         'model/tcp-hybla.cc',
         'model/tcp-vegas.cc',
+        'model/tcp-decongest.cc',
         'model/tcp-congestion-ops.cc',
         'model/tcp-westwood.cc',
-        'model/tcp-scalable.cc', 
+        'model/tcp-scalable.cc',
         'model/tcp-veno.cc',
         'model/tcp-bic.cc',
         'model/tcp-yeah.cc',
@@ -384,6 +385,7 @@ def build(bld):
         'model/tcp-highspeed.h',
         'model/tcp-hybla.h',
         'model/tcp-vegas.h',
+        'model/tcp-decongest.h',
         'model/tcp-congestion-ops.h',
         'model/tcp-westwood.h',
         'model/tcp-scalable.h',
@@ -425,4 +427,3 @@ def build(bld):
         bld.recurse('examples')
 
     bld.ns3_python_bindings()
-
