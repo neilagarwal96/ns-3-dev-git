@@ -20,8 +20,8 @@
  *          Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
  */
 
-#ifndef TCP_SOCKET_H
-#define TCP_SOCKET_H
+#ifndef FLONASE_SOCKET_H
+#define FLONASE_SOCKET_H
 
 #include "ns3/socket.h"
 #include "ns3/traced-callback.h"
@@ -37,14 +37,14 @@ class Packet;
 
 /**
  * \ingroup socket
- * \ingroup tcp
+ * \ingroup flonase
  *
- * \brief (abstract) base class of all TcpSockets
+ * \brief (abstract) base class of all FlonaseSockets
  *
- * This class exists solely for hosting TcpSocket attributes that can
+ * This class exists solely for hosting FlonaseSocket attributes that can
  * be reused across different implementations.
  */
-class TcpSocket : public Socket
+class FlonaseSocket : public Socket
 {
 public:
   /**
@@ -53,13 +53,13 @@ public:
    * \return the object TypeId
    */
   static TypeId GetTypeId (void);
- 
-  TcpSocket (void);
-  virtual ~TcpSocket (void);
+
+  FlonaseSocket (void);
+  virtual ~FlonaseSocket (void);
 
   /**
-   * \ingroup tcp
-   * \brief Names of the 11 TCP states
+   * \ingroup flonase
+   * \brief Names of the 11 FLONASE states
    *
    */
   typedef enum {
@@ -86,12 +86,12 @@ public:
                     *  may not have gotten our last ACK causing it
                     *  to retransmit the data packet (which we ignore)        */
     LAST_STATE    /**< Last state, used only in debug messages                */
-  } TcpStates_t;
+  } FlonaseStates_t;
 
   /**
-   * \brief Literal names of TCP states for use in log messages
+   * \brief Literal names of FLONASE states for use in log messages
    */
-  static const char* const TcpStateName[TcpSocket::LAST_STATE];
+  static const char* const FlonaseStateName[FlonaseSocket::LAST_STATE];
 
 private:
   // Indirect the attribute setting and getting through private virtual methods
@@ -220,13 +220,13 @@ private:
    * \brief Enable/Disable Nagle's algorithm.
    * \param noDelay true to DISABLE Nagle's algorithm
    */
-  virtual void SetTcpNoDelay (bool noDelay) = 0;
+  virtual void SetFlonaseNoDelay (bool noDelay) = 0;
 
   /**
    * \brief Check if Nagle's algorithm is enabled or not.
    * \returns true if Nagle's algorithm is DISABLED
    */
-  virtual bool GetTcpNoDelay (void) const = 0;
+  virtual bool GetFlonaseNoDelay (void) const = 0;
 
   /**
    * \brief Set the timeout for persistent connection
@@ -253,17 +253,15 @@ private:
 };
 
 /**
- * \ingroup tcp
- * TracedValue Callback signature for TcpStates_t
+ * \ingroup flonase
+ * TracedValue Callback signature for FlonaseStates_t
  *
  * \param [in] oldValue original value of the traced variable
  * \param [in] newValue new value of the traced variable
  */
-typedef void (* TcpStatesTracedValueCallback)(const TcpSocket::TcpStates_t oldValue,
-                                              const TcpSocket::TcpStates_t newValue);
+typedef void (* FlonaseStatesTracedValueCallback)(const FlonaseSocket::FlonaseStates_t oldValue,
+                                              const FlonaseSocket::FlonaseStates_t newValue);
 
 } // namespace ns3
 
-#endif /* TCP_SOCKET_H */
-
-
+#endif /* FLONASE_SOCKET_H */

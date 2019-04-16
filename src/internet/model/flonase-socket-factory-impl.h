@@ -17,45 +17,45 @@
  *
  * Author: Raj Bhattacharjea <raj.b@gatech.edu>
  */
-#ifndef TCP_SOCKET_FACTORY_IMPL_H
-#define TCP_SOCKET_FACTORY_IMPL_H
+#ifndef FLONASE_SOCKET_FACTORY_IMPL_H
+#define FLONASE_SOCKET_FACTORY_IMPL_H
 
-#include "ns3/tcp-socket-factory.h"
+#include "ns3/flonase-socket-factory.h"
 #include "ns3/ptr.h"
 
 namespace ns3 {
 
-class TcpL4Protocol;
+class FlonaseL4Protocol;
 
 /**
  * \ingroup socket
- * \ingroup tcp
+ * \ingroup flonase
  *
- * \brief socket factory implementation for native ns-3 TCP
+ * \brief socket factory implementation for native ns-3 FLONASE
  *
  *
- * This class serves to create sockets of the TcpSocketBase type.
+ * This class serves to create sockets of the FlonaseSocketBase type.
  */
-class TcpSocketFactoryImpl : public TcpSocketFactory
+class FlonaseSocketFactoryImpl : public FlonaseSocketFactory
 {
 public:
-  TcpSocketFactoryImpl ();
-  virtual ~TcpSocketFactoryImpl ();
+  FlonaseSocketFactoryImpl ();
+  virtual ~FlonaseSocketFactoryImpl ();
 
   /**
-   * \brief Set the associated TCP L4 protocol.
-   * \param tcp the TCP L4 protocol
+   * \brief Set the associated FLONASE L4 protocol.
+   * \param flonase the FLONASE L4 protocol
    */
-  void SetTcp (Ptr<TcpL4Protocol> tcp);
+  void SetFlonase (Ptr<FlonaseL4Protocol> flonase);
 
   virtual Ptr<Socket> CreateSocket (void);
 
 protected:
   virtual void DoDispose (void);
 private:
-  Ptr<TcpL4Protocol> m_tcp; //!< the associated TCP L4 protocol
+  Ptr<FlonaseL4Protocol> m_flonase; //!< the associated FLONASE L4 protocol
 };
 
 } // namespace ns3
 
-#endif /* TCP_SOCKET_FACTORY_IMPL_H */
+#endif /* FLONASE_SOCKET_FACTORY_IMPL_H */

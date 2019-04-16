@@ -16,18 +16,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#ifndef TCPCONGESTIONOPS_H
-#define TCPCONGESTIONOPS_H
+#ifndef FLONASECONGESTIONOPS_H
+#define FLONASECONGESTIONOPS_H
 
-#include "ns3/tcp-socket-state.h"
+#include "ns3/flonase-socket-state.h"
 
 namespace ns3 {
 
 /**
- * \ingroup tcp
+ * \ingroup flonase
  * \defgroup congestionOps Congestion Control Algorithms.
  *
- * The various congestion control algorithms, also known as "TCP flavors".
+ * The various congestion control algorithms, also known as "FLONASE flavors".
  */
 
 /**
@@ -38,8 +38,8 @@ namespace ns3 {
  * The design is inspired on what Linux v4.0 does (but it has been
  * in place since years). The congestion control is split from the main
  * socket code, and it is a pluggable component. An interface has been defined;
- * variables are maintained in the TcpSocketState class, while subclasses of
- * TcpCongestionOps operate over an instance of that class.
+ * variables are maintained in the FlonaseSocketState class, while subclasses of
+ * FlonaseCongestionOps operate over an instance of that class.
  *
  * Only three methods has been utilized right now; however, Linux has many others,
  * which can be added later in ns-3.
@@ -47,7 +47,7 @@ namespace ns3 {
  * \see IncreaseWindow
  * \see PktsAcked
  */
-class TcpCongestionOps : public Object
+class FlonaseCongestionOps : public Object
 {
 public:
   /**
@@ -56,15 +56,15 @@ public:
    */
   static TypeId GetTypeId (void);
 
-  TcpCongestionOps ();
+  FlonaseCongestionOps ();
 
   /**
    * \brief Copy constructor.
    * \param other object to copy.
    */
-  TcpCongestionOps (const TcpCongestionOps &other);
+  FlonaseCongestionOps (const FlonaseCongestionOps &other);
 
-  virtual ~TcpCongestionOps ();
+  virtual ~FlonaseCongestionOps ();
 
   /**
    * \brief Get the name of the congestion control algorithm
@@ -76,10 +76,10 @@ public:
   /**
    * \brief Get the slow start threshold after a loss event
    *
-   * Is guaranteed that the congestion control state (TcpAckState_t) is
+   * Is guaranteed that the congestion control state (FlonaseAckState_t) is
    * changed BEFORE the invocation of this method.
    * The implementator should return the slow start threshold (and not change
-   * it directly) because, in the future, the TCP implementation may require to
+   * it directly) because, in the future, the FLONASE implementation may require to
    * instantly recover from a loss event (e.g. when there is a network with an high
    * reordering factor).
    *
@@ -87,7 +87,7 @@ public:
    * \param bytesInFlight total bytes in flight
    * \return Slow start threshold
    */
-  virtual uint32_t GetSsThresh (Ptr<const TcpSocketState> tcb,
+  virtual uint32_t GetSsThresh (Ptr<const FlonaseSocketState> tcb,
                                 uint32_t bytesInFlight) = 0;
 
   /**
@@ -101,7 +101,7 @@ public:
    * \param tcb internal congestion state
    * \param segmentsAcked count of segments acked
    */
-  virtual void IncreaseWindow (Ptr<TcpSocketState> tcb, uint32_t segmentsAcked) = 0;
+  virtual void IncreaseWindow (Ptr<FlonaseSocketState> tcb, uint32_t segmentsAcked) = 0;
 
   /**
    * \brief Timing information on received ACK
@@ -115,7 +115,7 @@ public:
    * \param segmentsAcked count of segments acked
    * \param rtt last rtt
    */
-  virtual void PktsAcked (Ptr<TcpSocketState> tcb, uint32_t segmentsAcked,
+  virtual void PktsAcked (Ptr<FlonaseSocketState> tcb, uint32_t segmentsAcked,
                           const Time& rtt)
   {
     NS_UNUSED (tcb);
@@ -130,10 +130,10 @@ public:
    * The function is called before changing congestion state.
    *
    * \param tcb internal congestion state
-   * \param newState new congestion state to which the TCP is going to switch
+   * \param newState new congestion state to which the FLONASE is going to switch
    */
-  virtual void CongestionStateSet (Ptr<TcpSocketState> tcb,
-                                   const TcpSocketState::TcpCongState_t newState)
+  virtual void CongestionStateSet (Ptr<FlonaseSocketState> tcb,
+                                   const FlonaseSocketState::FlonaseCongState_t newState)
   {
     NS_UNUSED (tcb);
     NS_UNUSED (newState);
@@ -148,8 +148,8 @@ public:
    * \param tcb internal congestion state
    * \param event the event which triggered this function
    */
-  virtual void CwndEvent (Ptr<TcpSocketState> tcb,
-                          const TcpSocketState::TcpCAEvent_t event)
+  virtual void CwndEvent (Ptr<FlonaseSocketState> tcb,
+                          const FlonaseSocketState::FlonaseCAEvent_t event)
   {
     NS_UNUSED (tcb);
     NS_UNUSED (event);
@@ -166,7 +166,7 @@ public:
    *
    * \return a pointer of the copied object
    */
-  virtual Ptr<TcpCongestionOps> Fork () = 0;
+  virtual Ptr<FlonaseCongestionOps> Fork () = 0;
 };
 
 /**
@@ -177,7 +177,7 @@ public:
  *
  * \see IncreaseWindow
  */
-class TcpNewReno : public TcpCongestionOps
+class FlonaseNewReno : public FlonaseCongestionOps
 {
 public:
   /**
@@ -186,29 +186,29 @@ public:
    */
   static TypeId GetTypeId (void);
 
-  TcpNewReno ();
+  FlonaseNewReno ();
 
   /**
    * \brief Copy constructor.
    * \param sock object to copy.
    */
-  TcpNewReno (const TcpNewReno& sock);
+  FlonaseNewReno (const FlonaseNewReno& sock);
 
-  ~TcpNewReno ();
+  ~FlonaseNewReno ();
 
   std::string GetName () const;
 
-  virtual void IncreaseWindow (Ptr<TcpSocketState> tcb, uint32_t segmentsAcked);
-  virtual uint32_t GetSsThresh (Ptr<const TcpSocketState> tcb,
+  virtual void IncreaseWindow (Ptr<FlonaseSocketState> tcb, uint32_t segmentsAcked);
+  virtual uint32_t GetSsThresh (Ptr<const FlonaseSocketState> tcb,
                                 uint32_t bytesInFlight);
 
-  virtual Ptr<TcpCongestionOps> Fork ();
+  virtual Ptr<FlonaseCongestionOps> Fork ();
 
 protected:
-  virtual uint32_t SlowStart (Ptr<TcpSocketState> tcb, uint32_t segmentsAcked);
-  virtual void CongestionAvoidance (Ptr<TcpSocketState> tcb, uint32_t segmentsAcked);
+  virtual uint32_t SlowStart (Ptr<FlonaseSocketState> tcb, uint32_t segmentsAcked);
+  virtual void CongestionAvoidance (Ptr<FlonaseSocketState> tcb, uint32_t segmentsAcked);
 };
 
 } // namespace ns3
 
-#endif // TCPCONGESTIONOPS_H
+#endif // FLONASECONGESTIONOPS_H

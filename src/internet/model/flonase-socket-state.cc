@@ -15,68 +15,68 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include "tcp-socket-state.h"
+#include "flonase-socket-state.h"
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (TcpSocketState);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseSocketState);
 
 TypeId
-TcpSocketState::GetTypeId (void)
+FlonaseSocketState::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpSocketState")
+  static TypeId tid = TypeId ("ns3::FlonaseSocketState")
     .SetParent<Object> ()
     .SetGroupName ("Internet")
-    .AddConstructor <TcpSocketState> ()
+    .AddConstructor <FlonaseSocketState> ()
     .AddAttribute ("EnablePacing", "Enable Pacing",
                    BooleanValue (false),
-                   MakeBooleanAccessor (&TcpSocketState::m_pacing),
+                   MakeBooleanAccessor (&FlonaseSocketState::m_pacing),
                    MakeBooleanChecker ())
     .AddAttribute ("MaxPacingRate", "Set Max Pacing Rate",
                    DataRateValue (DataRate ("4Gb/s")),
-                   MakeDataRateAccessor (&TcpSocketState::m_maxPacingRate),
+                   MakeDataRateAccessor (&FlonaseSocketState::m_maxPacingRate),
                    MakeDataRateChecker ())
     .AddTraceSource ("CongestionWindow",
-                     "The TCP connection's congestion window",
-                     MakeTraceSourceAccessor (&TcpSocketState::m_cWnd),
+                     "The FLONASE connection's congestion window",
+                     MakeTraceSourceAccessor (&FlonaseSocketState::m_cWnd),
                      "ns3::TracedValueCallback::Uint32")
     .AddTraceSource ("CongestionWindowInflated",
-                     "The TCP connection's inflated congestion window",
-                     MakeTraceSourceAccessor (&TcpSocketState::m_cWndInfl),
+                     "The FLONASE connection's inflated congestion window",
+                     MakeTraceSourceAccessor (&FlonaseSocketState::m_cWndInfl),
                      "ns3::TracedValueCallback::Uint32")
     .AddTraceSource ("SlowStartThreshold",
-                     "TCP slow start threshold (bytes)",
-                     MakeTraceSourceAccessor (&TcpSocketState::m_ssThresh),
+                     "FLONASE slow start threshold (bytes)",
+                     MakeTraceSourceAccessor (&FlonaseSocketState::m_ssThresh),
                      "ns3::TracedValueCallback::Uint32")
     .AddTraceSource ("CongState",
-                     "TCP Congestion machine state",
-                     MakeTraceSourceAccessor (&TcpSocketState::m_congState),
-                     "ns3::TracedValueCallback::TcpCongState")
+                     "FLONASE Congestion machine state",
+                     MakeTraceSourceAccessor (&FlonaseSocketState::m_congState),
+                     "ns3::TracedValueCallback::FlonaseCongState")
     .AddTraceSource ("EcnState",
                      "Trace ECN state change of socket",
-                     MakeTraceSourceAccessor (&TcpSocketState::m_ecnState),
+                     MakeTraceSourceAccessor (&FlonaseSocketState::m_ecnState),
                      "ns3::TracedValueCallback::EcnState")
     .AddTraceSource ("HighestSequence",
                      "Highest sequence number received from peer",
-                     MakeTraceSourceAccessor (&TcpSocketState::m_highTxMark),
+                     MakeTraceSourceAccessor (&FlonaseSocketState::m_highTxMark),
                      "ns3::TracedValueCallback::SequenceNumber32")
     .AddTraceSource ("NextTxSequence",
                      "Next sequence number to send (SND.NXT)",
-                     MakeTraceSourceAccessor (&TcpSocketState::m_nextTxSequence),
+                     MakeTraceSourceAccessor (&FlonaseSocketState::m_nextTxSequence),
                      "ns3::TracedValueCallback::SequenceNumber32")
     .AddTraceSource ("BytesInFlight",
-                     "The TCP connection's congestion window",
-                     MakeTraceSourceAccessor (&TcpSocketState::m_bytesInFlight),
+                     "The FLONASE connection's congestion window",
+                     MakeTraceSourceAccessor (&FlonaseSocketState::m_bytesInFlight),
                      "ns3::TracedValueCallback::Uint32")
     .AddTraceSource ("RTT",
                      "Last RTT sample",
-                     MakeTraceSourceAccessor (&TcpSocketState::m_lastRtt),
+                     MakeTraceSourceAccessor (&FlonaseSocketState::m_lastRtt),
                      "ns3::TracedValueCallback::Time")
   ;
   return tid;
 }
 
-TcpSocketState::TcpSocketState (const TcpSocketState &other)
+FlonaseSocketState::FlonaseSocketState (const FlonaseSocketState &other)
   : Object (other),
     m_cWnd (other.m_cWnd),
     m_ssThresh (other.m_ssThresh),
@@ -100,13 +100,13 @@ TcpSocketState::TcpSocketState (const TcpSocketState &other)
 }
 
 const char* const
-TcpSocketState::TcpCongStateName[TcpSocketState::CA_LAST_STATE] =
+FlonaseSocketState::FlonaseCongStateName[FlonaseSocketState::CA_LAST_STATE] =
 {
   "CA_OPEN", "CA_DISORDER", "CA_CWR", "CA_RECOVERY", "CA_LOSS"
 };
 
 const char* const
-TcpSocketState::EcnStateName[TcpSocketState::ECN_CWR_SENT + 1] =
+FlonaseSocketState::EcnStateName[FlonaseSocketState::ECN_CWR_SENT + 1] =
 {
   "ECN_DISABLED", "ECN_IDLE", "ECN_CE_RCVD", "ECN_SENDING_ECE", "ECN_ECE_RCVD", "ECN_CWR_SENT"
 };

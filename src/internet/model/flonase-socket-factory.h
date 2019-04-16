@@ -17,8 +17,8 @@
  *
  * Author: Raj Bhattacharjea <raj.b@gatech.edu>
  */
-#ifndef TCP_SOCKET_FACTORY_H
-#define TCP_SOCKET_FACTORY_H
+#ifndef FLONASE_SOCKET_FACTORY_H
+#define FLONASE_SOCKET_FACTORY_H
 
 #include "ns3/socket-factory.h"
 
@@ -28,23 +28,23 @@ class Socket;
 
 /**
  * \ingroup socket
- * \ingroup tcp
+ * \ingroup flonase
  *
- * \brief API to create TCP socket instances 
+ * \brief API to create FLONASE socket instances
  *
- * This abstract class defines the API for TCP sockets.
+ * This abstract class defines the API for FLONASE sockets.
  * This class also holds the global default variables used to
  * initialize newly created sockets, such as values that are
  * set through the sysctl or proc interfaces in Linux.
 
- * All TCP socket factory implementations must provide an implementation 
+ * All FLONASE socket factory implementations must provide an implementation
  * of CreateSocket
  * below, and should make use of the default values configured below.
- * 
- * \see TcpSocketFactoryImpl
+ *
+ * \see FlonaseSocketFactoryImpl
  *
  */
-class TcpSocketFactory : public SocketFactory
+class FlonaseSocketFactory : public SocketFactory
 {
 public:
   /**
@@ -58,4 +58,4 @@ public:
 
 } // namespace ns3
 
-#endif /* TCP_SOCKET_FACTORY_H */
+#endif /* FLONASE_SOCKET_FACTORY_H */

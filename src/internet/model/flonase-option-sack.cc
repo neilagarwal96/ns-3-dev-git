@@ -23,43 +23,43 @@
  *                            James P.G. Sterbenz <jpgs@ittc.ku.edu>, director
  */
 
-#include "tcp-option-sack.h"
+#include "flonase-option-sack.h"
 #include "ns3/log.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("TcpOptionSack");
+NS_LOG_COMPONENT_DEFINE ("FlonaseOptionSack");
 
-NS_OBJECT_ENSURE_REGISTERED (TcpOptionSack);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseOptionSack);
 
-TcpOptionSack::TcpOptionSack ()
-  : TcpOption ()
+FlonaseOptionSack::FlonaseOptionSack ()
+  : FlonaseOption ()
 {
 }
 
-TcpOptionSack::~TcpOptionSack ()
+FlonaseOptionSack::~FlonaseOptionSack ()
 {
 }
 
 TypeId
-TcpOptionSack::GetTypeId (void)
+FlonaseOptionSack::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpOptionSack")
-    .SetParent<TcpOption> ()
+  static TypeId tid = TypeId ("ns3::FlonaseOptionSack")
+    .SetParent<FlonaseOption> ()
     .SetGroupName ("Internet")
-    .AddConstructor<TcpOptionSack> ()
+    .AddConstructor<FlonaseOptionSack> ()
   ;
   return tid;
 }
 
 TypeId
-TcpOptionSack::GetInstanceTypeId (void) const
+FlonaseOptionSack::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
 void
-TcpOptionSack::Print (std::ostream &os) const
+FlonaseOptionSack::Print (std::ostream &os) const
 {
   os << "blocks: " << GetNumSackBlocks () << ",";
   for (SackList::const_iterator it = m_sackList.begin (); it != m_sackList.end (); ++it)
@@ -69,7 +69,7 @@ TcpOptionSack::Print (std::ostream &os) const
 }
 
 uint32_t
-TcpOptionSack::GetSerializedSize (void) const
+FlonaseOptionSack::GetSerializedSize (void) const
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC ("Serialized size: " << 2 + GetNumSackBlocks () * 8);
@@ -77,7 +77,7 @@ TcpOptionSack::GetSerializedSize (void) const
 }
 
 void
-TcpOptionSack::Serialize (Buffer::Iterator start) const
+FlonaseOptionSack::Serialize (Buffer::Iterator start) const
 {
   NS_LOG_FUNCTION (this);
   Buffer::Iterator i = start;
@@ -95,7 +95,7 @@ TcpOptionSack::Serialize (Buffer::Iterator start) const
 }
 
 uint32_t
-TcpOptionSack::Deserialize (Buffer::Iterator start)
+FlonaseOptionSack::Deserialize (Buffer::Iterator start)
 {
   NS_LOG_FUNCTION (this);
   Buffer::Iterator i = start;
@@ -123,20 +123,20 @@ TcpOptionSack::Deserialize (Buffer::Iterator start)
 }
 
 uint8_t
-TcpOptionSack::GetKind (void) const
+FlonaseOptionSack::GetKind (void) const
 {
-  return TcpOption::SACK;
+  return FlonaseOption::SACK;
 }
 
 void
-TcpOptionSack::AddSackBlock (SackBlock s)
+FlonaseOptionSack::AddSackBlock (SackBlock s)
 {
   NS_LOG_FUNCTION (this);
   m_sackList.push_back (s);
 }
 
 uint32_t
-TcpOptionSack::GetNumSackBlocks (void) const
+FlonaseOptionSack::GetNumSackBlocks (void) const
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_LOGIC ("Number of SACK blocks appended: " << m_sackList.size ());
@@ -144,20 +144,20 @@ TcpOptionSack::GetNumSackBlocks (void) const
 }
 
 void
-TcpOptionSack::ClearSackList (void)
+FlonaseOptionSack::ClearSackList (void)
 {
   m_sackList.clear ();
 }
 
-TcpOptionSack::SackList
-TcpOptionSack::GetSackList (void) const
+FlonaseOptionSack::SackList
+FlonaseOptionSack::GetSackList (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_sackList;
 }
 
 std::ostream &
-operator<< (std::ostream & os, TcpOptionSack const & sackOption)
+operator<< (std::ostream & os, FlonaseOptionSack const & sackOption)
 {
   std::stringstream ss;
   ss << "{";
@@ -171,7 +171,7 @@ operator<< (std::ostream & os, TcpOptionSack const & sackOption)
 }
 
 std::ostream &
-operator<< (std::ostream & os, TcpOptionSack::SackBlock const & sackBlock)
+operator<< (std::ostream & os, FlonaseOptionSack::SackBlock const & sackBlock)
 {
   std::stringstream ss;
   ss << "[" << sackBlock.first << ";" << sackBlock.second << "]";

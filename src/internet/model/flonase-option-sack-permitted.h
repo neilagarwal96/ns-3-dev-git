@@ -23,23 +23,23 @@
  *                            James P.G. Sterbenz <jpgs@ittc.ku.edu>, director
  */
 
-#ifndef TCP_OPTION_SACK_PERMITTED_H
-#define TCP_OPTION_SACK_PERMITTED_H
+#ifndef FLONASE_OPTION_SACK_PERMITTED_H
+#define FLONASE_OPTION_SACK_PERMITTED_H
 
-#include "ns3/tcp-option.h"
+#include "ns3/flonase-option.h"
 
 namespace ns3 {
 
 /**
- * \brief Defines the TCP option of kind 4 (selective acknowledgment permitted
+ * \brief Defines the FLONASE option of kind 4 (selective acknowledgment permitted
  * option) as in \RFC{2018}
  *
- * TCP Sack-Permitted Option is 2-byte in length and sent in a SYN segment by a
- * TCP host that can recognize and process SACK option during the lifetime of a
+ * FLONASE Sack-Permitted Option is 2-byte in length and sent in a SYN segment by a
+ * FLONASE host that can recognize and process SACK option during the lifetime of a
  * connection.
  */
 
-class TcpOptionSackPermitted : public TcpOption
+class FlonaseOptionSackPermitted : public FlonaseOption
 {
 public:
   /**
@@ -49,8 +49,8 @@ public:
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
 
-  TcpOptionSackPermitted ();
-  virtual ~TcpOptionSackPermitted ();
+  FlonaseOptionSackPermitted ();
+  virtual ~FlonaseOptionSackPermitted ();
 
   virtual void Print (std::ostream &os) const;
   virtual void Serialize (Buffer::Iterator start) const;
@@ -62,4 +62,4 @@ public:
 
 } // namespace ns3
 
-#endif /* TCP_OPTION_SACK_PERMITTED */
+#endif /* FLONASE_OPTION_SACK_PERMITTED */

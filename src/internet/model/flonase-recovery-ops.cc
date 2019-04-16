@@ -20,37 +20,37 @@
  *         Mohit P. Tahiliani <tahiliani@nitk.edu.in>
  *
  */
-#include "tcp-recovery-ops.h"
-#include "tcp-socket-state.h"
+#include "flonase-recovery-ops.h"
+#include "flonase-socket-state.h"
 #include "ns3/log.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("TcpRecoveryOps");
+NS_LOG_COMPONENT_DEFINE ("FlonaseRecoveryOps");
 
-NS_OBJECT_ENSURE_REGISTERED (TcpRecoveryOps);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseRecoveryOps);
 
 TypeId
-TcpRecoveryOps::GetTypeId (void)
+FlonaseRecoveryOps::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpRecoveryOps")
+  static TypeId tid = TypeId ("ns3::FlonaseRecoveryOps")
     .SetParent<Object> ()
     .SetGroupName ("Internet")
   ;
   return tid;
 }
 
-TcpRecoveryOps::TcpRecoveryOps () : Object ()
+FlonaseRecoveryOps::FlonaseRecoveryOps () : Object ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-TcpRecoveryOps::TcpRecoveryOps (const TcpRecoveryOps &other) : Object (other)
+FlonaseRecoveryOps::FlonaseRecoveryOps (const FlonaseRecoveryOps &other) : Object (other)
 {
   NS_LOG_FUNCTION (this);
 }
 
-TcpRecoveryOps::~TcpRecoveryOps ()
+FlonaseRecoveryOps::~FlonaseRecoveryOps ()
 {
   NS_LOG_FUNCTION (this);
 }
@@ -58,37 +58,37 @@ TcpRecoveryOps::~TcpRecoveryOps ()
 
 // Classic recovery
 
-NS_OBJECT_ENSURE_REGISTERED (TcpClassicRecovery);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseClassicRecovery);
 
 TypeId
-TcpClassicRecovery::GetTypeId (void)
+FlonaseClassicRecovery::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpClassicRecovery")
-    .SetParent<TcpRecoveryOps> ()
+  static TypeId tid = TypeId ("ns3::FlonaseClassicRecovery")
+    .SetParent<FlonaseRecoveryOps> ()
     .SetGroupName ("Internet")
-    .AddConstructor<TcpClassicRecovery> ()
+    .AddConstructor<FlonaseClassicRecovery> ()
   ;
   return tid;
 }
 
-TcpClassicRecovery::TcpClassicRecovery (void) : TcpRecoveryOps ()
+FlonaseClassicRecovery::FlonaseClassicRecovery (void) : FlonaseRecoveryOps ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-TcpClassicRecovery::TcpClassicRecovery (const TcpClassicRecovery& sock)
-  : TcpRecoveryOps (sock)
+FlonaseClassicRecovery::FlonaseClassicRecovery (const FlonaseClassicRecovery& sock)
+  : FlonaseRecoveryOps (sock)
 {
   NS_LOG_FUNCTION (this);
 }
 
-TcpClassicRecovery::~TcpClassicRecovery (void)
+FlonaseClassicRecovery::~FlonaseClassicRecovery (void)
 {
   NS_LOG_FUNCTION (this);
 }
 
 void
-TcpClassicRecovery::EnterRecovery (Ptr<TcpSocketState> tcb, uint32_t dupAckCount,
+FlonaseClassicRecovery::EnterRecovery (Ptr<FlonaseSocketState> tcb, uint32_t dupAckCount,
                                 uint32_t unAckDataCount, uint32_t lastSackedBytes)
 {
   NS_LOG_FUNCTION (this << tcb << dupAckCount << unAckDataCount << lastSackedBytes);
@@ -99,7 +99,7 @@ TcpClassicRecovery::EnterRecovery (Ptr<TcpSocketState> tcb, uint32_t dupAckCount
 }
 
 void
-TcpClassicRecovery::DoRecovery (Ptr<TcpSocketState> tcb, uint32_t lastAckedBytes,
+FlonaseClassicRecovery::DoRecovery (Ptr<FlonaseSocketState> tcb, uint32_t lastAckedBytes,
                              uint32_t lastSackedBytes)
 {
   NS_LOG_FUNCTION (this << tcb << lastAckedBytes << lastSackedBytes);
@@ -109,7 +109,7 @@ TcpClassicRecovery::DoRecovery (Ptr<TcpSocketState> tcb, uint32_t lastAckedBytes
 }
 
 void
-TcpClassicRecovery::ExitRecovery (Ptr<TcpSocketState> tcb)
+FlonaseClassicRecovery::ExitRecovery (Ptr<FlonaseSocketState> tcb)
 {
   NS_LOG_FUNCTION (this << tcb);
   // Follow NewReno procedures to exit FR if SACK is disabled
@@ -121,16 +121,15 @@ TcpClassicRecovery::ExitRecovery (Ptr<TcpSocketState> tcb)
 }
 
 std::string
-TcpClassicRecovery::GetName () const
+FlonaseClassicRecovery::GetName () const
 {
-  return "TcpClassicRecovery";
+  return "FlonaseClassicRecovery";
 }
 
-Ptr<TcpRecoveryOps>
-TcpClassicRecovery::Fork ()
+Ptr<FlonaseRecoveryOps>
+FlonaseClassicRecovery::Fork ()
 {
-  return CopyObject<TcpClassicRecovery> (this);
+  return CopyObject<FlonaseClassicRecovery> (this);
 }
 
 } // namespace ns3
-

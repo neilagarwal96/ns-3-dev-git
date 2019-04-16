@@ -17,39 +17,39 @@
  *
  * Author: Raj Bhattacharjea <raj.b@gatech.edu>
  */
-#include "tcp-socket-factory-impl.h"
-#include "tcp-l4-protocol.h"
+#include "flonase-socket-factory-impl.h"
+#include "flonase-l4-protocol.h"
 #include "ns3/socket.h"
 #include "ns3/assert.h"
 
 namespace ns3 {
 
-TcpSocketFactoryImpl::TcpSocketFactoryImpl ()
-  : m_tcp (0)
+FlonaseSocketFactoryImpl::FlonaseSocketFactoryImpl ()
+  : m_flonase (0)
 {
 }
-TcpSocketFactoryImpl::~TcpSocketFactoryImpl ()
+FlonaseSocketFactoryImpl::~FlonaseSocketFactoryImpl ()
 {
-  NS_ASSERT (m_tcp == 0);
+  NS_ASSERT (m_flonase == 0);
 }
 
 void
-TcpSocketFactoryImpl::SetTcp (Ptr<TcpL4Protocol> tcp)
+FlonaseSocketFactoryImpl::SetFlonase (Ptr<FlonaseL4Protocol> flonase)
 {
-  m_tcp = tcp;
+  m_flonase = flonase;
 }
 
 Ptr<Socket>
-TcpSocketFactoryImpl::CreateSocket (void)
+FlonaseSocketFactoryImpl::CreateSocket (void)
 {
-  return m_tcp->CreateSocket ();
+  return m_flonase->CreateSocket ();
 }
 
-void 
-TcpSocketFactoryImpl::DoDispose (void)
+void
+FlonaseSocketFactoryImpl::DoDispose (void)
 {
-  m_tcp = 0;
-  TcpSocketFactory::DoDispose ();
+  m_flonase = 0;
+  FlonaseSocketFactory::DoDispose ();
 }
 
 } // namespace ns3

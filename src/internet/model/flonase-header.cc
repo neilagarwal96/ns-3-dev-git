@@ -20,19 +20,19 @@
 
 #include <stdint.h>
 #include <iostream>
-#include "tcp-header.h"
-#include "tcp-option.h"
+#include "flonase-header.h"
+#include "flonase-option.h"
 #include "ns3/buffer.h"
 #include "ns3/address-utils.h"
 #include "ns3/log.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("TcpHeader");
+NS_LOG_COMPONENT_DEFINE ("FlonaseHeader");
 
-NS_OBJECT_ENSURE_REGISTERED (TcpHeader);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseHeader);
 
-TcpHeader::TcpHeader ()
+FlonaseHeader::FlonaseHeader ()
   : m_sourcePort (0),
     m_destinationPort (0),
     m_sequenceNumber (0),
@@ -47,12 +47,12 @@ TcpHeader::TcpHeader ()
 {
 }
 
-TcpHeader::~TcpHeader ()
+FlonaseHeader::~FlonaseHeader ()
 {
 }
 
 std::string
-TcpHeader::FlagsToString (uint8_t flags, const std::string& delimiter)
+FlonaseHeader::FlagsToString (uint8_t flags, const std::string& delimiter)
 {
   static const char* flagNames[8] = {
     "FIN",
@@ -80,115 +80,115 @@ TcpHeader::FlagsToString (uint8_t flags, const std::string& delimiter)
 }
 
 void
-TcpHeader::EnableChecksums (void)
+FlonaseHeader::EnableChecksums (void)
 {
   m_calcChecksum = true;
 }
 
 void
-TcpHeader::SetSourcePort (uint16_t port)
+FlonaseHeader::SetSourcePort (uint16_t port)
 {
   m_sourcePort = port;
 }
 
 void
-TcpHeader::SetDestinationPort (uint16_t port)
+FlonaseHeader::SetDestinationPort (uint16_t port)
 {
   m_destinationPort = port;
 }
 
 void
-TcpHeader::SetSequenceNumber (SequenceNumber32 sequenceNumber)
+FlonaseHeader::SetSequenceNumber (SequenceNumber32 sequenceNumber)
 {
   m_sequenceNumber = sequenceNumber;
 }
 
 void
-TcpHeader::SetAckNumber (SequenceNumber32 ackNumber)
+FlonaseHeader::SetAckNumber (SequenceNumber32 ackNumber)
 {
   m_ackNumber = ackNumber;
 }
 
 void
-TcpHeader::SetFlags (uint8_t flags)
+FlonaseHeader::SetFlags (uint8_t flags)
 {
   m_flags = flags;
 }
 
 void
-TcpHeader::SetWindowSize (uint16_t windowSize)
+FlonaseHeader::SetWindowSize (uint16_t windowSize)
 {
   m_windowSize = windowSize;
 }
 
 void
-TcpHeader::SetUrgentPointer (uint16_t urgentPointer)
+FlonaseHeader::SetUrgentPointer (uint16_t urgentPointer)
 {
   m_urgentPointer = urgentPointer;
 }
 
 uint16_t
-TcpHeader::GetSourcePort () const
+FlonaseHeader::GetSourcePort () const
 {
   return m_sourcePort;
 }
 
 uint16_t
-TcpHeader::GetDestinationPort () const
+FlonaseHeader::GetDestinationPort () const
 {
   return m_destinationPort;
 }
 
 SequenceNumber32
-TcpHeader::GetSequenceNumber () const
+FlonaseHeader::GetSequenceNumber () const
 {
   return m_sequenceNumber;
 }
 
 SequenceNumber32
-TcpHeader::GetAckNumber () const
+FlonaseHeader::GetAckNumber () const
 {
   return m_ackNumber;
 }
 
 uint8_t
-TcpHeader::GetLength () const
+FlonaseHeader::GetLength () const
 {
   return m_length;
 }
 
 uint8_t
-TcpHeader::GetOptionLength () const
+FlonaseHeader::GetOptionLength () const
 {
   return m_optionsLen;
 }
 
 uint8_t
-TcpHeader::GetMaxOptionLength () const
+FlonaseHeader::GetMaxOptionLength () const
 {
   return m_maxOptionsLen;
 }
 
 uint8_t
-TcpHeader::GetFlags () const
+FlonaseHeader::GetFlags () const
 {
   return m_flags;
 }
 
 uint16_t
-TcpHeader::GetWindowSize () const
+FlonaseHeader::GetWindowSize () const
 {
   return m_windowSize;
 }
 
 uint16_t
-TcpHeader::GetUrgentPointer () const
+FlonaseHeader::GetUrgentPointer () const
 {
   return m_urgentPointer;
 }
 
 void
-TcpHeader::InitializeChecksum (const Ipv4Address &source,
+FlonaseHeader::InitializeChecksum (const Ipv4Address &source,
                                const Ipv4Address &destination,
                                uint8_t protocol)
 {
@@ -198,7 +198,7 @@ TcpHeader::InitializeChecksum (const Ipv4Address &source,
 }
 
 void
-TcpHeader::InitializeChecksum (const Ipv6Address &source,
+FlonaseHeader::InitializeChecksum (const Ipv6Address &source,
                                const Ipv6Address &destination,
                                uint8_t protocol)
 {
@@ -208,7 +208,7 @@ TcpHeader::InitializeChecksum (const Ipv6Address &source,
 }
 
 void
-TcpHeader::InitializeChecksum (const Address &source,
+FlonaseHeader::InitializeChecksum (const Address &source,
                                const Address &destination,
                                uint8_t protocol)
 {
@@ -218,7 +218,7 @@ TcpHeader::InitializeChecksum (const Address &source,
 }
 
 uint16_t
-TcpHeader::CalculateHeaderChecksum (uint16_t size) const
+FlonaseHeader::CalculateHeaderChecksum (uint16_t size) const
 {
   /* Buffer size must be at least as large as the largest IP pseudo-header */
   /* [per RFC2460, but without consideration for IPv6 extension hdrs]      */
@@ -261,30 +261,30 @@ TcpHeader::CalculateHeaderChecksum (uint16_t size) const
 }
 
 bool
-TcpHeader::IsChecksumOk (void) const
+FlonaseHeader::IsChecksumOk (void) const
 {
   return m_goodChecksum;
 }
 
 TypeId
-TcpHeader::GetTypeId (void)
+FlonaseHeader::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpHeader")
+  static TypeId tid = TypeId ("ns3::FlonaseHeader")
     .SetParent<Header> ()
     .SetGroupName ("Internet")
-    .AddConstructor<TcpHeader> ()
+    .AddConstructor<FlonaseHeader> ()
   ;
   return tid;
 }
 
 TypeId
-TcpHeader::GetInstanceTypeId (void) const
+FlonaseHeader::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
 void
-TcpHeader::Print (std::ostream &os)  const
+FlonaseHeader::Print (std::ostream &os)  const
 {
   os << m_sourcePort << " > " << m_destinationPort;
 
@@ -295,7 +295,7 @@ TcpHeader::Print (std::ostream &os)  const
 
   os << " Seq=" << m_sequenceNumber << " Ack=" << m_ackNumber << " Win=" << m_windowSize;
 
-  TcpOptionList::const_iterator op;
+  FlonaseOptionList::const_iterator op;
 
   for (op = m_options.begin (); op != m_options.end (); ++op)
     {
@@ -306,13 +306,13 @@ TcpHeader::Print (std::ostream &os)  const
 }
 
 uint32_t
-TcpHeader::GetSerializedSize (void)  const
+FlonaseHeader::GetSerializedSize (void)  const
 {
   return CalculateHeaderLength () * 4;
 }
 
 void
-TcpHeader::Serialize (Buffer::Iterator start)  const
+FlonaseHeader::Serialize (Buffer::Iterator start)  const
 {
   Buffer::Iterator i = start;
   i.WriteHtonU16 (m_sourcePort);
@@ -328,7 +328,7 @@ TcpHeader::Serialize (Buffer::Iterator start)  const
   // This implementation does not presently try to align options on word
   // boundaries using NOP options
   uint32_t optionLen = 0;
-  TcpOptionList::const_iterator op;
+  FlonaseOptionList::const_iterator op;
   for (op = m_options.begin (); op != m_options.end (); ++op)
     {
       optionLen += (*op)->GetSerializedSize ();
@@ -339,7 +339,7 @@ TcpHeader::Serialize (Buffer::Iterator start)  const
   // padding to word alignment; add ENDs and/or pad values (they are the same)
   while (optionLen % 4)
     {
-      i.WriteU8 (TcpOption::END);
+      i.WriteU8 (FlonaseOption::END);
       ++optionLen;
     }
 
@@ -357,7 +357,7 @@ TcpHeader::Serialize (Buffer::Iterator start)  const
 }
 
 uint32_t
-TcpHeader::Deserialize (Buffer::Iterator start)
+FlonaseHeader::Deserialize (Buffer::Iterator start)
 {
   m_optionsLen = 0;
   Buffer::Iterator i = start;
@@ -377,21 +377,21 @@ TcpHeader::Deserialize (Buffer::Iterator start)
   uint32_t optionLen = (m_length - 5) * 4;
   if (optionLen > m_maxOptionsLen)
     {
-      NS_LOG_ERROR ("Illegal TCP option length " << optionLen << "; options discarded");
+      NS_LOG_ERROR ("Illegal FLONASE option length " << optionLen << "; options discarded");
       return 20;
     }
   while (optionLen)
     {
       uint8_t kind = i.PeekU8 ();
-      Ptr<TcpOption> op;
+      Ptr<FlonaseOption> op;
       uint32_t optionSize;
-      if (TcpOption::IsKindKnown (kind))
+      if (FlonaseOption::IsKindKnown (kind))
         {
-          op = TcpOption::CreateOption (kind);
+          op = FlonaseOption::CreateOption (kind);
         }
       else
         {
-          op = TcpOption::CreateOption (TcpOption::UNKNOWN);
+          op = FlonaseOption::CreateOption (FlonaseOption::UNKNOWN);
           NS_LOG_WARN ("Option kind " << static_cast<int> (kind) << " unknown, skipping.");
         }
       optionSize = op->Deserialize (i);
@@ -409,10 +409,10 @@ TcpHeader::Deserialize (Buffer::Iterator start)
         }
       else
         {
-          NS_LOG_ERROR ("Option exceeds TCP option space; option discarded");
+          NS_LOG_ERROR ("Option exceeds FLONASE option space; option discarded");
           break;
         }
-      if (op->GetKind () == TcpOption::END)
+      if (op->GetKind () == FlonaseOption::END)
         {
           while (optionLen)
             {
@@ -442,10 +442,10 @@ TcpHeader::Deserialize (Buffer::Iterator start)
 }
 
 uint8_t
-TcpHeader::CalculateHeaderLength () const
+FlonaseHeader::CalculateHeaderLength () const
 {
   uint32_t len = 20;
-  TcpOptionList::const_iterator i;
+  FlonaseOptionList::const_iterator i;
 
   for (i = m_options.begin (); i != m_options.end (); ++i)
     {
@@ -460,17 +460,17 @@ TcpHeader::CalculateHeaderLength () const
 }
 
 bool
-TcpHeader::AppendOption (Ptr<const TcpOption> option)
+FlonaseHeader::AppendOption (Ptr<const FlonaseOption> option)
 {
   if (m_optionsLen + option->GetSerializedSize () <= m_maxOptionsLen)
     {
-      if (!TcpOption::IsKindKnown (option->GetKind ()))
+      if (!FlonaseOption::IsKindKnown (option->GetKind ()))
         {
           NS_LOG_WARN ("The option kind " << static_cast<int> (option->GetKind ()) << " is unknown");
           return false;
         }
 
-      if (option->GetKind () != TcpOption::END)
+      if (option->GetKind () != FlonaseOption::END)
         {
           m_options.push_back (option);
           m_optionsLen += option->GetSerializedSize ();
@@ -485,16 +485,16 @@ TcpHeader::AppendOption (Ptr<const TcpOption> option)
   return false;
 }
 
-const TcpHeader::TcpOptionList&
-TcpHeader::GetOptionList () const
+const FlonaseHeader::FlonaseOptionList&
+FlonaseHeader::GetOptionList () const
 {
   return m_options;
 }
 
-Ptr<const TcpOption>
-TcpHeader::GetOption(uint8_t kind) const
+Ptr<const FlonaseOption>
+FlonaseHeader::GetOption(uint8_t kind) const
 {
-  TcpOptionList::const_iterator i;
+  FlonaseOptionList::const_iterator i;
 
   for (i = m_options.begin (); i != m_options.end (); ++i)
     {
@@ -508,9 +508,9 @@ TcpHeader::GetOption(uint8_t kind) const
 }
 
 bool
-TcpHeader::HasOption (uint8_t kind) const
+FlonaseHeader::HasOption (uint8_t kind) const
 {
-  TcpOptionList::const_iterator i;
+  FlonaseOptionList::const_iterator i;
 
   for (i = m_options.begin (); i != m_options.end (); ++i)
     {
@@ -524,7 +524,7 @@ TcpHeader::HasOption (uint8_t kind) const
 }
 
 bool
-operator== (const TcpHeader &lhs, const TcpHeader &rhs)
+operator== (const FlonaseHeader &lhs, const FlonaseHeader &rhs)
 {
   return (
     lhs.m_sourcePort      == rhs.m_sourcePort
@@ -538,7 +538,7 @@ operator== (const TcpHeader &lhs, const TcpHeader &rhs)
 }
 
 std::ostream&
-operator<< (std::ostream& os, TcpHeader const & tc)
+operator<< (std::ostream& os, FlonaseHeader const & tc)
 {
   tc.Print (os);
   return os;

@@ -30,8 +30,8 @@
 #include "ns3/ipv4-route.h"
 #include "ns3/ipv6-route.h"
 
-#include "tcp-l4-protocol.h"
-#include "tcp-header.h"
+#include "flonase-l4-protocol.h"
+#include "flonase-header.h"
 #include "ipv4-end-point-demux.h"
 #include "ipv6-end-point-demux.h"
 #include "ipv4-end-point.h"
@@ -39,10 +39,10 @@
 #include "ipv4-l3-protocol.h"
 #include "ipv6-l3-protocol.h"
 #include "ipv6-routing-protocol.h"
-#include "tcp-socket-factory-impl.h"
-#include "tcp-socket-base.h"
-#include "tcp-congestion-ops.h"
-#include "tcp-recovery-ops.h"
+#include "flonase-socket-factory-impl.h"
+#include "flonase-socket-base.h"
+#include "flonase-congestion-ops.h"
+#include "flonase-recovery-ops.h"
 #include "rtt-estimator.h"
 
 #include <vector>
@@ -51,70 +51,70 @@
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("TcpL4Protocol");
+NS_LOG_COMPONENT_DEFINE ("FlonaseL4Protocol");
 
-NS_OBJECT_ENSURE_REGISTERED (TcpL4Protocol);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseL4Protocol);
 
-//TcpL4Protocol stuff----------------------------------------------------------
+//FlonaseL4Protocol stuff----------------------------------------------------------
 
 #undef NS_LOG_APPEND_CONTEXT
 #define NS_LOG_APPEND_CONTEXT                                   \
   if (m_node) { std::clog << " [node " << m_node->GetId () << "] "; }
 
 /* see http://www.iana.org/assignments/protocol-numbers */
-const uint8_t TcpL4Protocol::PROT_NUMBER = 6;
+const uint8_t FlonaseL4Protocol::PROT_NUMBER = 6;
 
 TypeId
-TcpL4Protocol::GetTypeId (void)
+FlonaseL4Protocol::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpL4Protocol")
+  static TypeId tid = TypeId ("ns3::FlonaseL4Protocol")
     .SetParent<IpL4Protocol> ()
     .SetGroupName ("Internet")
-    .AddConstructor<TcpL4Protocol> ()
+    .AddConstructor<FlonaseL4Protocol> ()
     .AddAttribute ("RttEstimatorType",
                    "Type of RttEstimator objects.",
                    TypeIdValue (RttMeanDeviation::GetTypeId ()),
-                   MakeTypeIdAccessor (&TcpL4Protocol::m_rttTypeId),
+                   MakeTypeIdAccessor (&FlonaseL4Protocol::m_rttTypeId),
                    MakeTypeIdChecker ())
     .AddAttribute ("SocketType",
-                   "Socket type of TCP objects.",
-                   TypeIdValue (TcpNewReno::GetTypeId ()),
-                   MakeTypeIdAccessor (&TcpL4Protocol::m_congestionTypeId),
+                   "Socket type of FLONASE objects.",
+                   TypeIdValue (FlonaseNewReno::GetTypeId ()),
+                   MakeTypeIdAccessor (&FlonaseL4Protocol::m_congestionTypeId),
                    MakeTypeIdChecker ())
     .AddAttribute ("RecoveryType",
-                   "Recovery type of TCP objects.",
-                   TypeIdValue (TcpClassicRecovery::GetTypeId ()),
-                   MakeTypeIdAccessor (&TcpL4Protocol::m_recoveryTypeId),
+                   "Recovery type of FLONASE objects.",
+                   TypeIdValue (FlonaseClassicRecovery::GetTypeId ()),
+                   MakeTypeIdAccessor (&FlonaseL4Protocol::m_recoveryTypeId),
                    MakeTypeIdChecker ())
     .AddAttribute ("SocketList", "The list of sockets associated to this protocol.",
                    ObjectVectorValue (),
-                   MakeObjectVectorAccessor (&TcpL4Protocol::m_sockets),
-                   MakeObjectVectorChecker<TcpSocketBase> ())
+                   MakeObjectVectorAccessor (&FlonaseL4Protocol::m_sockets),
+                   MakeObjectVectorChecker<FlonaseSocketBase> ())
   ;
   return tid;
 }
 
-TcpL4Protocol::TcpL4Protocol ()
+FlonaseL4Protocol::FlonaseL4Protocol ()
   : m_endPoints (new Ipv4EndPointDemux ()), m_endPoints6 (new Ipv6EndPointDemux ())
 {
   NS_LOG_FUNCTION_NOARGS ();
-  NS_LOG_LOGIC ("Made a TcpL4Protocol " << this);
+  NS_LOG_LOGIC ("Made a FlonaseL4Protocol " << this);
 }
 
-TcpL4Protocol::~TcpL4Protocol ()
+FlonaseL4Protocol::~FlonaseL4Protocol ()
 {
   NS_LOG_FUNCTION (this);
 }
 
 void
-TcpL4Protocol::SetNode (Ptr<Node> node)
+FlonaseL4Protocol::SetNode (Ptr<Node> node)
 {
   NS_LOG_FUNCTION (this);
   m_node = node;
 }
 
 void
-TcpL4Protocol::NotifyNewAggregate ()
+FlonaseL4Protocol::NotifyNewAggregate ()
 {
   NS_LOG_FUNCTION (this);
   Ptr<Node> node = this->GetObject<Node> ();
@@ -126,9 +126,9 @@ TcpL4Protocol::NotifyNewAggregate ()
       if ((node != 0) && (ipv4 != 0 || ipv6 != 0))
         {
           this->SetNode (node);
-          Ptr<TcpSocketFactoryImpl> tcpFactory = CreateObject<TcpSocketFactoryImpl> ();
-          tcpFactory->SetTcp (this);
-          node->AggregateObject (tcpFactory);
+          Ptr<FlonaseSocketFactoryImpl> flonaseFactory = CreateObject<FlonaseSocketFactoryImpl> ();
+          flonaseFactory->SetFlonase (this);
+          node->AggregateObject (flonaseFactory);
         }
     }
 
@@ -151,13 +151,13 @@ TcpL4Protocol::NotifyNewAggregate ()
 }
 
 int
-TcpL4Protocol::GetProtocolNumber (void) const
+FlonaseL4Protocol::GetProtocolNumber (void) const
 {
   return PROT_NUMBER;
 }
 
 void
-TcpL4Protocol::DoDispose (void)
+FlonaseL4Protocol::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
   m_sockets.clear ();
@@ -181,13 +181,13 @@ TcpL4Protocol::DoDispose (void)
 }
 
 Ptr<Socket>
-TcpL4Protocol::CreateSocket (TypeId congestionTypeId)
+FlonaseL4Protocol::CreateSocket (TypeId congestionTypeId)
 {
   return CreateSocket (congestionTypeId, m_recoveryTypeId);
 }
 
 Ptr<Socket>
-TcpL4Protocol::CreateSocket (TypeId congestionTypeId, TypeId recoveryTypeId)
+FlonaseL4Protocol::CreateSocket (TypeId congestionTypeId, TypeId recoveryTypeId)
 {
   NS_LOG_FUNCTION (this << congestionTypeId.GetName ());
   ObjectFactory rttFactory;
@@ -198,12 +198,12 @@ TcpL4Protocol::CreateSocket (TypeId congestionTypeId, TypeId recoveryTypeId)
   recoveryAlgorithmFactory.SetTypeId (recoveryTypeId);
 
   Ptr<RttEstimator> rtt = rttFactory.Create<RttEstimator> ();
-  Ptr<TcpSocketBase> socket = CreateObject<TcpSocketBase> ();
-  Ptr<TcpCongestionOps> algo = congestionAlgorithmFactory.Create<TcpCongestionOps> ();
-  Ptr<TcpRecoveryOps> recovery = recoveryAlgorithmFactory.Create<TcpRecoveryOps> ();
+  Ptr<FlonaseSocketBase> socket = CreateObject<FlonaseSocketBase> ();
+  Ptr<FlonaseCongestionOps> algo = congestionAlgorithmFactory.Create<FlonaseCongestionOps> ();
+  Ptr<FlonaseRecoveryOps> recovery = recoveryAlgorithmFactory.Create<FlonaseRecoveryOps> ();
 
   socket->SetNode (m_node);
-  socket->SetTcp (this);
+  socket->SetFlonase (this);
   socket->SetRtt (rtt);
   socket->SetCongestionControlAlgorithm (algo);
   socket->SetRecoveryAlgorithm (recovery);
@@ -213,41 +213,41 @@ TcpL4Protocol::CreateSocket (TypeId congestionTypeId, TypeId recoveryTypeId)
 }
 
 Ptr<Socket>
-TcpL4Protocol::CreateSocket (void)
+FlonaseL4Protocol::CreateSocket (void)
 {
   return CreateSocket (m_congestionTypeId, m_recoveryTypeId);
 }
 
 Ipv4EndPoint *
-TcpL4Protocol::Allocate (void)
+FlonaseL4Protocol::Allocate (void)
 {
   NS_LOG_FUNCTION (this);
   return m_endPoints->Allocate ();
 }
 
 Ipv4EndPoint *
-TcpL4Protocol::Allocate (Ipv4Address address)
+FlonaseL4Protocol::Allocate (Ipv4Address address)
 {
   NS_LOG_FUNCTION (this << address);
   return m_endPoints->Allocate (address);
 }
 
 Ipv4EndPoint *
-TcpL4Protocol::Allocate (Ptr<NetDevice> boundNetDevice, uint16_t port)
+FlonaseL4Protocol::Allocate (Ptr<NetDevice> boundNetDevice, uint16_t port)
 {
   NS_LOG_FUNCTION (this << boundNetDevice << port);
   return m_endPoints->Allocate (boundNetDevice, port);
 }
 
 Ipv4EndPoint *
-TcpL4Protocol::Allocate (Ptr<NetDevice> boundNetDevice, Ipv4Address address, uint16_t port)
+FlonaseL4Protocol::Allocate (Ptr<NetDevice> boundNetDevice, Ipv4Address address, uint16_t port)
 {
   NS_LOG_FUNCTION (this << boundNetDevice << address << port);
   return m_endPoints->Allocate (boundNetDevice, address, port);
 }
 
 Ipv4EndPoint *
-TcpL4Protocol::Allocate (Ptr<NetDevice> boundNetDevice,
+FlonaseL4Protocol::Allocate (Ptr<NetDevice> boundNetDevice,
                          Ipv4Address localAddress, uint16_t localPort,
                          Ipv4Address peerAddress, uint16_t peerPort)
 {
@@ -258,42 +258,42 @@ TcpL4Protocol::Allocate (Ptr<NetDevice> boundNetDevice,
 }
 
 void
-TcpL4Protocol::DeAllocate (Ipv4EndPoint *endPoint)
+FlonaseL4Protocol::DeAllocate (Ipv4EndPoint *endPoint)
 {
   NS_LOG_FUNCTION (this << endPoint);
   m_endPoints->DeAllocate (endPoint);
 }
 
 Ipv6EndPoint *
-TcpL4Protocol::Allocate6 (void)
+FlonaseL4Protocol::Allocate6 (void)
 {
   NS_LOG_FUNCTION (this);
   return m_endPoints6->Allocate ();
 }
 
 Ipv6EndPoint *
-TcpL4Protocol::Allocate6 (Ipv6Address address)
+FlonaseL4Protocol::Allocate6 (Ipv6Address address)
 {
   NS_LOG_FUNCTION (this << address);
   return m_endPoints6->Allocate (address);
 }
 
 Ipv6EndPoint *
-TcpL4Protocol::Allocate6 (Ptr<NetDevice> boundNetDevice, uint16_t port)
+FlonaseL4Protocol::Allocate6 (Ptr<NetDevice> boundNetDevice, uint16_t port)
 {
   NS_LOG_FUNCTION (this << boundNetDevice << port);
   return m_endPoints6->Allocate (boundNetDevice, port);
 }
 
 Ipv6EndPoint *
-TcpL4Protocol::Allocate6 (Ptr<NetDevice> boundNetDevice, Ipv6Address address, uint16_t port)
+FlonaseL4Protocol::Allocate6 (Ptr<NetDevice> boundNetDevice, Ipv6Address address, uint16_t port)
 {
   NS_LOG_FUNCTION (this << boundNetDevice << address << port);
   return m_endPoints6->Allocate (boundNetDevice, address, port);
 }
 
 Ipv6EndPoint *
-TcpL4Protocol::Allocate6 (Ptr<NetDevice> boundNetDevice,
+FlonaseL4Protocol::Allocate6 (Ptr<NetDevice> boundNetDevice,
                           Ipv6Address localAddress, uint16_t localPort,
                           Ipv6Address peerAddress, uint16_t peerPort)
 {
@@ -304,14 +304,14 @@ TcpL4Protocol::Allocate6 (Ptr<NetDevice> boundNetDevice,
 }
 
 void
-TcpL4Protocol::DeAllocate (Ipv6EndPoint *endPoint)
+FlonaseL4Protocol::DeAllocate (Ipv6EndPoint *endPoint)
 {
   NS_LOG_FUNCTION (this << endPoint);
   m_endPoints6->DeAllocate (endPoint);
 }
 
 void
-TcpL4Protocol::ReceiveIcmp (Ipv4Address icmpSource, uint8_t icmpTtl,
+FlonaseL4Protocol::ReceiveIcmp (Ipv4Address icmpSource, uint8_t icmpTtl,
                             uint8_t icmpType, uint8_t icmpCode, uint32_t icmpInfo,
                             Ipv4Address payloadSource,Ipv4Address payloadDestination,
                             const uint8_t payload[8])
@@ -338,7 +338,7 @@ TcpL4Protocol::ReceiveIcmp (Ipv4Address icmpSource, uint8_t icmpTtl,
 }
 
 void
-TcpL4Protocol::ReceiveIcmp (Ipv6Address icmpSource, uint8_t icmpTtl,
+FlonaseL4Protocol::ReceiveIcmp (Ipv6Address icmpSource, uint8_t icmpTtl,
                             uint8_t icmpType, uint8_t icmpCode, uint32_t icmpInfo,
                             Ipv6Address payloadSource,Ipv6Address payloadDestination,
                             const uint8_t payload[8])
@@ -365,26 +365,26 @@ TcpL4Protocol::ReceiveIcmp (Ipv6Address icmpSource, uint8_t icmpTtl,
 }
 
 enum IpL4Protocol::RxStatus
-TcpL4Protocol::PacketReceived (Ptr<Packet> packet, TcpHeader &incomingTcpHeader,
+FlonaseL4Protocol::PacketReceived (Ptr<Packet> packet, FlonaseHeader &incomingFlonaseHeader,
                                const Address &source, const Address &destination)
 {
-  NS_LOG_FUNCTION (this << packet << incomingTcpHeader << source << destination);
+  NS_LOG_FUNCTION (this << packet << incomingFlonaseHeader << source << destination);
 
   if (Node::ChecksumEnabled ())
     {
-      incomingTcpHeader.EnableChecksums ();
-      incomingTcpHeader.InitializeChecksum (source, destination, PROT_NUMBER);
+      incomingFlonaseHeader.EnableChecksums ();
+      incomingFlonaseHeader.InitializeChecksum (source, destination, PROT_NUMBER);
     }
 
-  packet->PeekHeader (incomingTcpHeader);
+  packet->PeekHeader (incomingFlonaseHeader);
 
-  NS_LOG_LOGIC ("TcpL4Protocol " << this
-                                 << " receiving seq " << incomingTcpHeader.GetSequenceNumber ()
-                                 << " ack " << incomingTcpHeader.GetAckNumber ()
-                                 << " flags "<< TcpHeader::FlagsToString (incomingTcpHeader.GetFlags ())
+  NS_LOG_LOGIC ("FlonaseL4Protocol " << this
+                                 << " receiving seq " << incomingFlonaseHeader.GetSequenceNumber ()
+                                 << " ack " << incomingFlonaseHeader.GetAckNumber ()
+                                 << " flags "<< FlonaseHeader::FlagsToString (incomingFlonaseHeader.GetFlags ())
                                  << " data size " << packet->GetSize ());
 
-  if (!incomingTcpHeader.IsChecksumOk ())
+  if (!incomingFlonaseHeader.IsChecksumOk ())
     {
       NS_LOG_INFO ("Bad checksum, dropping packet!");
       return IpL4Protocol::RX_CSUM_FAILED;
@@ -394,53 +394,53 @@ TcpL4Protocol::PacketReceived (Ptr<Packet> packet, TcpHeader &incomingTcpHeader,
 }
 
 void
-TcpL4Protocol::NoEndPointsFound (const TcpHeader &incomingHeader,
+FlonaseL4Protocol::NoEndPointsFound (const FlonaseHeader &incomingHeader,
                                  const Address &incomingSAddr,
                                  const Address &incomingDAddr)
 {
   NS_LOG_FUNCTION (this << incomingHeader << incomingSAddr << incomingDAddr);
 
-  if (!(incomingHeader.GetFlags () & TcpHeader::RST))
+  if (!(incomingHeader.GetFlags () & FlonaseHeader::RST))
     {
       // build a RST packet and send
       Ptr<Packet> rstPacket = Create<Packet> ();
-      TcpHeader outgoingTcpHeader;
+      FlonaseHeader outgoingFlonaseHeader;
 
-      if (incomingHeader.GetFlags () & TcpHeader::ACK)
+      if (incomingHeader.GetFlags () & FlonaseHeader::ACK)
         {
           // ACK bit was set
-          outgoingTcpHeader.SetFlags (TcpHeader::RST);
-          outgoingTcpHeader.SetSequenceNumber (incomingHeader.GetAckNumber ());
+          outgoingFlonaseHeader.SetFlags (FlonaseHeader::RST);
+          outgoingFlonaseHeader.SetSequenceNumber (incomingHeader.GetAckNumber ());
         }
       else
         {
-          outgoingTcpHeader.SetFlags (TcpHeader::RST | TcpHeader::ACK);
-          outgoingTcpHeader.SetSequenceNumber (SequenceNumber32 (0));
-          outgoingTcpHeader.SetAckNumber (incomingHeader.GetSequenceNumber () +
+          outgoingFlonaseHeader.SetFlags (FlonaseHeader::RST | FlonaseHeader::ACK);
+          outgoingFlonaseHeader.SetSequenceNumber (SequenceNumber32 (0));
+          outgoingFlonaseHeader.SetAckNumber (incomingHeader.GetSequenceNumber () +
                                           SequenceNumber32 (1));
         }
 
       // Remember that parameters refer to the incoming packet; in reply,
       // we need to swap src/dst
 
-      outgoingTcpHeader.SetSourcePort (incomingHeader.GetDestinationPort ());
-      outgoingTcpHeader.SetDestinationPort (incomingHeader.GetSourcePort ());
+      outgoingFlonaseHeader.SetSourcePort (incomingHeader.GetDestinationPort ());
+      outgoingFlonaseHeader.SetDestinationPort (incomingHeader.GetSourcePort ());
 
-      SendPacket (rstPacket, outgoingTcpHeader, incomingDAddr, incomingSAddr);
+      SendPacket (rstPacket, outgoingFlonaseHeader, incomingDAddr, incomingSAddr);
     }
 }
 
 enum IpL4Protocol::RxStatus
-TcpL4Protocol::Receive (Ptr<Packet> packet,
+FlonaseL4Protocol::Receive (Ptr<Packet> packet,
                         Ipv4Header const &incomingIpHeader,
                         Ptr<Ipv4Interface> incomingInterface)
 {
   NS_LOG_FUNCTION (this << packet << incomingIpHeader << incomingInterface);
 
-  TcpHeader incomingTcpHeader;
+  FlonaseHeader incomingFlonaseHeader;
   IpL4Protocol::RxStatus checksumControl;
 
-  checksumControl = PacketReceived (packet, incomingTcpHeader,
+  checksumControl = PacketReceived (packet, incomingFlonaseHeader,
                                     incomingIpHeader.GetSource (),
                                     incomingIpHeader.GetDestination ());
 
@@ -451,16 +451,16 @@ TcpL4Protocol::Receive (Ptr<Packet> packet,
 
   Ipv4EndPointDemux::EndPoints endPoints;
   endPoints = m_endPoints->Lookup (incomingIpHeader.GetDestination (),
-                                   incomingTcpHeader.GetDestinationPort (),
+                                   incomingFlonaseHeader.GetDestinationPort (),
                                    incomingIpHeader.GetSource (),
-                                   incomingTcpHeader.GetSourcePort (),
+                                   incomingFlonaseHeader.GetSourcePort (),
                                    incomingInterface);
 
   if (endPoints.empty ())
     {
       if (this->GetObject<Ipv6L3Protocol> () != 0)
         {
-          NS_LOG_LOGIC ("  No Ipv4 endpoints matched on TcpL4Protocol, trying Ipv6 " << this);
+          NS_LOG_LOGIC ("  No Ipv4 endpoints matched on FlonaseL4Protocol, trying Ipv6 " << this);
           Ptr<Ipv6Interface> fakeInterface;
           Ipv6Header ipv6Header;
           Ipv6Address src, dst;
@@ -472,14 +472,14 @@ TcpL4Protocol::Receive (Ptr<Packet> packet,
           return (this->Receive (packet, ipv6Header, fakeInterface));
         }
 
-      NS_LOG_LOGIC ("TcpL4Protocol " << this << " received a packet but"
+      NS_LOG_LOGIC ("FlonaseL4Protocol " << this << " received a packet but"
                     " no endpoints matched." <<
                     " destination IP: " << incomingIpHeader.GetDestination () <<
-                    " destination port: "<< incomingTcpHeader.GetDestinationPort () <<
+                    " destination port: "<< incomingFlonaseHeader.GetDestinationPort () <<
                     " source IP: " << incomingIpHeader.GetSource () <<
-                    " source port: "<< incomingTcpHeader.GetSourcePort ());
+                    " source port: "<< incomingFlonaseHeader.GetSourcePort ());
 
-      NoEndPointsFound (incomingTcpHeader, incomingIpHeader.GetSource (),
+      NoEndPointsFound (incomingFlonaseHeader, incomingIpHeader.GetSource (),
                         incomingIpHeader.GetDestination ());
 
       return IpL4Protocol::RX_ENDPOINT_CLOSED;
@@ -487,32 +487,32 @@ TcpL4Protocol::Receive (Ptr<Packet> packet,
     }
 
   NS_ASSERT_MSG (endPoints.size () == 1, "Demux returned more than one endpoint");
-  NS_LOG_LOGIC ("TcpL4Protocol " << this << " received a packet and"
+  NS_LOG_LOGIC ("FlonaseL4Protocol " << this << " received a packet and"
                 " now forwarding it up to endpoint/socket");
 
   (*endPoints.begin ())->ForwardUp (packet, incomingIpHeader,
-                                    incomingTcpHeader.GetSourcePort (),
+                                    incomingFlonaseHeader.GetSourcePort (),
                                     incomingInterface);
 
   return IpL4Protocol::RX_OK;
 }
 
 enum IpL4Protocol::RxStatus
-TcpL4Protocol::Receive (Ptr<Packet> packet,
+FlonaseL4Protocol::Receive (Ptr<Packet> packet,
                         Ipv6Header const &incomingIpHeader,
                         Ptr<Ipv6Interface> interface)
 {
   NS_LOG_FUNCTION (this << packet << incomingIpHeader.GetSourceAddress () <<
                    incomingIpHeader.GetDestinationAddress ());
 
-  TcpHeader incomingTcpHeader;
+  FlonaseHeader incomingFlonaseHeader;
   IpL4Protocol::RxStatus checksumControl;
 
-  // If we are receiving a v4-mapped packet, we will re-calculate the TCP checksum
+  // If we are receiving a v4-mapped packet, we will re-calculate the FLONASE checksum
   // Is it worth checking every received "v6" packet to see if it is v4-mapped in
-  // order to avoid re-calculating TCP checksums for v4-mapped packets?
+  // order to avoid re-calculating FLONASE checksums for v4-mapped packets?
 
-  checksumControl = PacketReceived (packet, incomingTcpHeader,
+  checksumControl = PacketReceived (packet, incomingFlonaseHeader,
                                     incomingIpHeader.GetSourceAddress (),
                                     incomingIpHeader.GetDestinationAddress ());
 
@@ -523,48 +523,48 @@ TcpL4Protocol::Receive (Ptr<Packet> packet,
 
   Ipv6EndPointDemux::EndPoints endPoints =
     m_endPoints6->Lookup (incomingIpHeader.GetDestinationAddress (),
-                          incomingTcpHeader.GetDestinationPort (),
+                          incomingFlonaseHeader.GetDestinationPort (),
                           incomingIpHeader.GetSourceAddress (),
-                          incomingTcpHeader.GetSourcePort (), interface);
+                          incomingFlonaseHeader.GetSourcePort (), interface);
   if (endPoints.empty ())
     {
-      NS_LOG_LOGIC ("TcpL4Protocol " << this << " received a packet but"
+      NS_LOG_LOGIC ("FlonaseL4Protocol " << this << " received a packet but"
                     " no endpoints matched." <<
                     " destination IP: " << incomingIpHeader.GetDestinationAddress () <<
-                    " destination port: "<< incomingTcpHeader.GetDestinationPort () <<
+                    " destination port: "<< incomingFlonaseHeader.GetDestinationPort () <<
                     " source IP: " << incomingIpHeader.GetSourceAddress () <<
-                    " source port: "<< incomingTcpHeader.GetSourcePort ());
+                    " source port: "<< incomingFlonaseHeader.GetSourcePort ());
 
-      NoEndPointsFound (incomingTcpHeader, incomingIpHeader.GetSourceAddress (),
+      NoEndPointsFound (incomingFlonaseHeader, incomingIpHeader.GetSourceAddress (),
                         incomingIpHeader.GetDestinationAddress ());
 
       return IpL4Protocol::RX_ENDPOINT_CLOSED;
     }
 
   NS_ASSERT_MSG (endPoints.size () == 1, "Demux returned more than one endpoint");
-  NS_LOG_LOGIC ("TcpL4Protocol " << this << " received a packet and"
+  NS_LOG_LOGIC ("FlonaseL4Protocol " << this << " received a packet and"
                 " now forwarding it up to endpoint/socket");
 
   (*endPoints.begin ())->ForwardUp (packet, incomingIpHeader,
-                                    incomingTcpHeader.GetSourcePort (), interface);
+                                    incomingFlonaseHeader.GetSourcePort (), interface);
 
   return IpL4Protocol::RX_OK;
 }
 
 void
-TcpL4Protocol::SendPacketV4 (Ptr<Packet> packet, const TcpHeader &outgoing,
+FlonaseL4Protocol::SendPacketV4 (Ptr<Packet> packet, const FlonaseHeader &outgoing,
                              const Ipv4Address &saddr, const Ipv4Address &daddr,
                              Ptr<NetDevice> oif) const
 {
   NS_LOG_FUNCTION (this << packet << saddr << daddr << oif);
-  NS_LOG_LOGIC ("TcpL4Protocol " << this
+  NS_LOG_LOGIC ("FlonaseL4Protocol " << this
                                  << " sending seq " << outgoing.GetSequenceNumber ()
                                  << " ack " << outgoing.GetAckNumber ()
-                                 << " flags " << TcpHeader::FlagsToString (outgoing.GetFlags ())
+                                 << " flags " << FlonaseHeader::FlagsToString (outgoing.GetFlags ())
                                  << " data size " << packet->GetSize ());
   // XXX outgoingHeader cannot be logged
 
-  TcpHeader outgoingHeader = outgoing;
+  FlonaseHeader outgoingHeader = outgoing;
   /** \todo UrgentPointer */
   /* outgoingHeader.SetUrgentPointer (0); */
   if (Node::ChecksumEnabled ())
@@ -598,20 +598,20 @@ TcpL4Protocol::SendPacketV4 (Ptr<Packet> packet, const TcpHeader &outgoing,
     }
   else
     {
-      NS_FATAL_ERROR ("Trying to use Tcp on a node without an Ipv4 interface");
+      NS_FATAL_ERROR ("Trying to use Flonase on a node without an Ipv4 interface");
     }
 }
 
 void
-TcpL4Protocol::SendPacketV6 (Ptr<Packet> packet, const TcpHeader &outgoing,
+FlonaseL4Protocol::SendPacketV6 (Ptr<Packet> packet, const FlonaseHeader &outgoing,
                              const Ipv6Address &saddr, const Ipv6Address &daddr,
                              Ptr<NetDevice> oif) const
 {
   NS_LOG_FUNCTION (this << packet << saddr << daddr << oif);
-  NS_LOG_LOGIC ("TcpL4Protocol " << this
+  NS_LOG_LOGIC ("FlonaseL4Protocol " << this
                                  << " sending seq " << outgoing.GetSequenceNumber ()
                                  << " ack " << outgoing.GetAckNumber ()
-                                 << " flags " << TcpHeader::FlagsToString (outgoing.GetFlags ())
+                                 << " flags " << FlonaseHeader::FlagsToString (outgoing.GetFlags ())
                                  << " data size " << packet->GetSize ());
   // XXX outgoingHeader cannot be logged
 
@@ -619,7 +619,7 @@ TcpL4Protocol::SendPacketV6 (Ptr<Packet> packet, const TcpHeader &outgoing,
     {
       return (SendPacket (packet, outgoing, saddr.GetIpv4MappedAddress (), daddr.GetIpv4MappedAddress (), oif));
     }
-  TcpHeader outgoingHeader = outgoing;
+  FlonaseHeader outgoingHeader = outgoing;
   /** \todo UrgentPointer */
   /* outgoingHeader.SetUrgentPointer (0); */
   if (Node::ChecksumEnabled ())
@@ -652,12 +652,12 @@ TcpL4Protocol::SendPacketV6 (Ptr<Packet> packet, const TcpHeader &outgoing,
     }
   else
     {
-      NS_FATAL_ERROR ("Trying to use Tcp on a node without an Ipv6 interface");
+      NS_FATAL_ERROR ("Trying to use Flonase on a node without an Ipv6 interface");
     }
 }
 
 void
-TcpL4Protocol::SendPacket (Ptr<Packet> pkt, const TcpHeader &outgoing,
+FlonaseL4Protocol::SendPacket (Ptr<Packet> pkt, const FlonaseHeader &outgoing,
                            const Address &saddr, const Address &daddr,
                            Ptr<NetDevice> oif) const
 {
@@ -703,10 +703,10 @@ TcpL4Protocol::SendPacket (Ptr<Packet> pkt, const TcpHeader &outgoing,
 }
 
 void
-TcpL4Protocol::AddSocket (Ptr<TcpSocketBase> socket)
+FlonaseL4Protocol::AddSocket (Ptr<FlonaseSocketBase> socket)
 {
   NS_LOG_FUNCTION (this << socket);
-  std::vector<Ptr<TcpSocketBase> >::iterator it = m_sockets.begin ();
+  std::vector<Ptr<FlonaseSocketBase> >::iterator it = m_sockets.begin ();
 
   while (it != m_sockets.end ())
     {
@@ -722,10 +722,10 @@ TcpL4Protocol::AddSocket (Ptr<TcpSocketBase> socket)
 }
 
 bool
-TcpL4Protocol::RemoveSocket (Ptr<TcpSocketBase> socket)
+FlonaseL4Protocol::RemoveSocket (Ptr<FlonaseSocketBase> socket)
 {
   NS_LOG_FUNCTION (this << socket);
-  std::vector<Ptr<TcpSocketBase> >::iterator it = m_sockets.begin ();
+  std::vector<Ptr<FlonaseSocketBase> >::iterator it = m_sockets.begin ();
 
   while (it != m_sockets.end ())
     {
@@ -742,28 +742,27 @@ TcpL4Protocol::RemoveSocket (Ptr<TcpSocketBase> socket)
 }
 
 void
-TcpL4Protocol::SetDownTarget (IpL4Protocol::DownTargetCallback callback)
+FlonaseL4Protocol::SetDownTarget (IpL4Protocol::DownTargetCallback callback)
 {
   m_downTarget = callback;
 }
 
 IpL4Protocol::DownTargetCallback
-TcpL4Protocol::GetDownTarget (void) const
+FlonaseL4Protocol::GetDownTarget (void) const
 {
   return m_downTarget;
 }
 
 void
-TcpL4Protocol::SetDownTarget6 (IpL4Protocol::DownTargetCallback6 callback)
+FlonaseL4Protocol::SetDownTarget6 (IpL4Protocol::DownTargetCallback6 callback)
 {
   m_downTarget6 = callback;
 }
 
 IpL4Protocol::DownTargetCallback6
-TcpL4Protocol::GetDownTarget6 (void) const
+FlonaseL4Protocol::GetDownTarget6 (void) const
 {
   return m_downTarget6;
 }
 
 } // namespace ns3
-

@@ -19,25 +19,25 @@
  * Original author: Adrian Sai-wah Tam <adrian.sw.tam@gmail.com>
  */
 
-#ifndef TCP_TX_BUFFER_H
-#define TCP_TX_BUFFER_H
+#ifndef FLONASE_TX_BUFFER_H
+#define FLONASE_TX_BUFFER_H
 
 #include "ns3/object.h"
 #include "ns3/traced-value.h"
 #include "ns3/sequence-number.h"
 #include "ns3/nstime.h"
-#include "ns3/tcp-option-sack.h"
+#include "ns3/flonase-option-sack.h"
 #include "ns3/packet.h"
 
 namespace ns3 {
 class Packet;
 
 /**
- * \ingroup tcp
+ * \ingroup flonase
  *
  * \brief Item that encloses the application packet and some flags for it
  */
-class TcpTxItem
+class FlonaseTxItem
 {
 public:
   // Default constructor, copy-constructor, destructor
@@ -64,9 +64,9 @@ public:
 };
 
 /**
- * \ingroup tcp
+ * \ingroup flonase
  *
- * \brief Tcp sender buffer
+ * \brief Flonase sender buffer
  *
  * The class keeps track of all data that the application wishes to transmit to
  * the other end. When the data is acknowledged, it is removed from the buffer.
@@ -98,10 +98,10 @@ public:
  * The SACK information is usually saved in a data structure referred as
  * scoreboard. In this implementation, the scoreboard is developed on top of
  * the existing classes. In particular, instead of keeping raw pointers to
- * packets in TcpTxBuffer we added the capability to store some flags
+ * packets in FlonaseTxBuffer we added the capability to store some flags
  * associated with every segment sent. This is done through the use of the
- * class TcpTxItem: instead of storing a list of packets, we store a list of
- * TcpTxItem. Each item has different flags (check the corresponding
+ * class FlonaseTxItem: instead of storing a list of packets, we store a list of
+ * FlonaseTxItem. Each item has different flags (check the corresponding
  * documentation) and maintaining the scoreboard is a matter of travelling the
  * list and set the SACK flag on the corresponding segment sent.
  *
@@ -143,7 +143,7 @@ public:
  * After the sender receives a new SACK block, it updates the amount of segment
  * that it considers as lost, following the specifications made in RFC 6675
  * (for more detail please see the method UpdateLostCount). In case of SACKless
- * connection, the TcpSocketImplementation should provide hints through
+ * connection, the FlonaseSocketImplementation should provide hints through
  * the MarkHeadAsLost and AddRenoSack methods.
  *
  * \see BytesInFlight
@@ -151,7 +151,7 @@ public:
  * \see SizeFromSequence
  * \see CopyFromSequence
  */
-class TcpTxBuffer : public Object
+class FlonaseTxBuffer : public Object
 {
 public:
   /**
@@ -163,8 +163,8 @@ public:
    * \brief Constructor
    * \param n initial Sequence number to be transmitted
    */
-  TcpTxBuffer (uint32_t n = 0);
-  virtual ~TcpTxBuffer (void);
+  FlonaseTxBuffer (uint32_t n = 0);
+  virtual ~FlonaseTxBuffer (void);
 
   // Accessors
 
@@ -221,7 +221,7 @@ public:
    * have been transmitted more than once, without acknowledgment.
    *
    * This method is to support the retransmits count for determining PipeSize
-   * in NewReno-style TCP.
+   * in NewReno-style FLONASE.
    *
    * \returns number of segments that have been transmitted more than once, without acknowledgment
    */
@@ -300,7 +300,7 @@ public:
    * \param list list of SACKed blocks
    * \returns true in case of an update
    */
-  bool Update (const TcpOptionSack::SackList &list);
+  bool Update (const FlonaseOptionSack::SackList &list);
 
   /**
    * \brief Check if a segment is lost
@@ -407,9 +407,9 @@ public:
   void ResetRenoSack ();
 
 private:
-  friend std::ostream & operator<< (std::ostream & os, TcpTxBuffer const & tcpTxBuf);
+  friend std::ostream & operator<< (std::ostream & os, FlonaseTxBuffer const & flonaseTxBuf);
 
-  typedef std::list<TcpTxItem*> PacketList; //!< container for data stored in the buffer
+  typedef std::list<FlonaseTxItem*> PacketList; //!< container for data stored in the buffer
 
   /**
    * \brief Update the lost count
@@ -423,7 +423,7 @@ private:
    * (classic Reno). While we are in Recovery and a partial ACK arrives,
    * we assume that one more packet is lost (NewReno).
    *
-   * The {New}Reno cases, for now, are managed in TcpSocketBase through the
+   * The {New}Reno cases, for now, are managed in FlonaseSocketBase through the
    * call to MarkHeadAsLost.
    * This function is, therefore, called after a SACK option has been received,
    * and updates the lost count. It can be probably optimized by not walking
@@ -440,7 +440,7 @@ private:
    * \param item Item that will be discarded
    * \param size size to remove (can be different from pktSize because of fragmentation)
    */
-  void RemoveFromCounts (TcpTxItem *item, uint32_t size);
+  void RemoveFromCounts (FlonaseTxItem *item, uint32_t size);
 
   /**
    * \brief Decide if a segment is lost based on RFC 6675 algorithm.
@@ -470,7 +470,7 @@ private:
    *
    * \return the item that contains the right packet
    */
-  TcpTxItem* GetNewSegment (uint32_t numBytes);
+  FlonaseTxItem* GetNewSegment (uint32_t numBytes);
 
   /**
    * \brief Get a block of data previously transmitted
@@ -486,7 +486,7 @@ private:
    * \param seq sequence requested
    * \returns the item that contains the right packet
    */
-  TcpTxItem* GetTransmittedSegment (uint32_t numBytes, const SequenceNumber32 &seq);
+  FlonaseTxItem* GetTransmittedSegment (uint32_t numBytes, const SequenceNumber32 &seq);
 
   /**
    * \brief Get a block (which is returned as Packet) from a list
@@ -547,7 +547,7 @@ private:
    *
    * While this could be extremely slow in the worst possible scenario (one big
    * packet which is split in small packets for transmission, and merged for
-   * re-transmission) that scenario is unlikely during a TCP transmission (since
+   * re-transmission) that scenario is unlikely during a FLONASE transmission (since
    * MSS can change, but it is stable, and retransmissions do not happen for
    * each segment).
    *
@@ -558,12 +558,12 @@ private:
    * \param listEdited output parameter which indicates if the list has been edited
    * \return the item that contains the right packet
    */
-  TcpTxItem* GetPacketFromList (PacketList &list, const SequenceNumber32 &startingSeq,
+  FlonaseTxItem* GetPacketFromList (PacketList &list, const SequenceNumber32 &startingSeq,
                                 uint32_t numBytes, const SequenceNumber32 &requestedSeq,
                                 bool *listEdited = nullptr) const;
 
   /**
-   * \brief Merge two TcpTxItem
+   * \brief Merge two FlonaseTxItem
    *
    * Merge t2 in t1. It consists in copying the lastSent field if t2 is more
    * recent than t1. Retransmitted field is copied only if it set in t2 but not
@@ -572,10 +572,10 @@ private:
    * \param t1 first item
    * \param t2 second item
    */
-  void MergeItems (TcpTxItem *t1, TcpTxItem *t2) const;
+  void MergeItems (FlonaseTxItem *t1, FlonaseTxItem *t2) const;
 
   /**
-   * \brief Split one TcpTxItem
+   * \brief Split one FlonaseTxItem
    *
    * Move "size" bytes from t2 into t1, copying all the fields.
    * Adjust the starting sequence of each item.
@@ -584,7 +584,7 @@ private:
    * \param t2 second item
    * \param size Size to split
    */
-  void SplitItems (TcpTxItem *t1, TcpTxItem *t2, uint32_t size) const;
+  void SplitItems (FlonaseTxItem *t1, FlonaseTxItem *t2, uint32_t size) const;
 
   /**
    * \brief Check if the values of sacked, lost, retrans, are in sync
@@ -596,7 +596,7 @@ private:
    * \brief Find the highest SACK byte
    * \return a pair with the highest byte and an iterator inside m_sentList
    */
-  std::pair <TcpTxBuffer::PacketList::const_iterator, SequenceNumber32>
+  std::pair <FlonaseTxBuffer::PacketList::const_iterator, SequenceNumber32>
   FindHighestSacked () const;
 
   PacketList m_appList;  //!< Buffer for application data
@@ -612,8 +612,8 @@ private:
   uint32_t m_sackedOut {0}; //!< Number of sacked bytes
   uint32_t m_retrans   {0}; //!< Number of retransmitted bytes
 
-  uint32_t m_dupAckThresh {0}; //!< Duplicate Ack threshold from TcpSocketBase
-  uint32_t m_segmentSize {0}; //!< Segment size from TcpSocketBase
+  uint32_t m_dupAckThresh {0}; //!< Duplicate Ack threshold from FlonaseSocketBase
+  uint32_t m_segmentSize {0}; //!< Segment size from FlonaseSocketBase
   bool     m_renoSack {false}; //!< Indicates if AddRenoSack was called
 
 };
@@ -621,10 +621,10 @@ private:
 /**
  * \brief Output operator.
  * \param os The output stream.
- * \param tcpTxBuf the TcpTxBuffer to print.
+ * \param flonaseTxBuf the FlonaseTxBuffer to print.
  * \returns The output stream.
  */
-std::ostream & operator<< (std::ostream & os, TcpTxBuffer const & tcpTxBuf);
+std::ostream & operator<< (std::ostream & os, FlonaseTxBuffer const & flonaseTxBuf);
 
 /**
  * \brief Output operator.
@@ -632,8 +632,8 @@ std::ostream & operator<< (std::ostream & os, TcpTxBuffer const & tcpTxBuf);
  * \param item the item to print.
  * \returns The output stream.
  */
-std::ostream & operator<< (std::ostream & os, TcpTxItem const & item);
+std::ostream & operator<< (std::ostream & os, FlonaseTxItem const & item);
 
 } // namespace ns3
 
-#endif /* TCP_TX_BUFFER_H */
+#endif /* FLONASE_TX_BUFFER_H */

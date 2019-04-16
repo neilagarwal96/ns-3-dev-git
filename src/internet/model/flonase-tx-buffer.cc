@@ -25,16 +25,16 @@
 #include "ns3/packet.h"
 #include "ns3/log.h"
 #include "ns3/abort.h"
-#include "ns3/tcp-option-ts.h"
+#include "ns3/flonase-option-ts.h"
 
-#include "tcp-tx-buffer.h"
+#include "flonase-tx-buffer.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("TcpTxBuffer");
+NS_LOG_COMPONENT_DEFINE ("FlonaseTxBuffer");
 
 void
-TcpTxItem::Print (std::ostream &os) const
+FlonaseTxItem::Print (std::ostream &os) const
 {
   bool comma = false;
   os << "[" << m_startSeq << ";" << m_startSeq + GetSeqSize () << "|"
@@ -71,92 +71,92 @@ TcpTxItem::Print (std::ostream &os) const
   os << "[" << m_lastSent.GetSeconds () << "]";
 }
 
-NS_OBJECT_ENSURE_REGISTERED (TcpTxBuffer);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseTxBuffer);
 
 TypeId
-TcpTxBuffer::GetTypeId (void)
+FlonaseTxBuffer::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpTxBuffer")
+  static TypeId tid = TypeId ("ns3::FlonaseTxBuffer")
     .SetParent<Object> ()
     .SetGroupName ("Internet")
-    .AddConstructor<TcpTxBuffer> ()
+    .AddConstructor<FlonaseTxBuffer> ()
     .AddTraceSource ("UnackSequence",
                      "First unacknowledged sequence number (SND.UNA)",
-                     MakeTraceSourceAccessor (&TcpTxBuffer::m_firstByteSeq),
+                     MakeTraceSourceAccessor (&FlonaseTxBuffer::m_firstByteSeq),
                      "ns3::SequenceNumber32TracedValueCallback")
   ;
   return tid;
 }
 
-/* A user is supposed to create a TcpSocket through a factory. In TcpSocket,
+/* A user is supposed to create a FlonaseSocket through a factory. In FlonaseSocket,
  * there are attributes SndBufSize and RcvBufSize to control the default Tx and
  * Rx window sizes respectively, with default of 128 KiByte. The attribute
- * SndBufSize is passed to TcpTxBuffer by TcpSocketBase::SetSndBufSize() and in
- * turn, TcpTxBuffer:SetMaxBufferSize(). Therefore, the m_maxBuffer value
+ * SndBufSize is passed to FlonaseTxBuffer by FlonaseSocketBase::SetSndBufSize() and in
+ * turn, FlonaseTxBuffer:SetMaxBufferSize(). Therefore, the m_maxBuffer value
  * initialized below is insignificant.
  */
-TcpTxBuffer::TcpTxBuffer (uint32_t n)
+FlonaseTxBuffer::FlonaseTxBuffer (uint32_t n)
   : m_maxBuffer (32768), m_size (0), m_sentSize (0), m_firstByteSeq (n)
 {
 }
 
-TcpTxBuffer::~TcpTxBuffer (void)
+FlonaseTxBuffer::~FlonaseTxBuffer (void)
 {
   PacketList::iterator it;
 
   for (it = m_sentList.begin (); it != m_sentList.end (); ++it)
     {
-      TcpTxItem *item = *it;
+      FlonaseTxItem *item = *it;
       m_sentSize -= item->m_packet->GetSize ();
       delete item;
     }
 
   for (it = m_appList.begin (); it != m_appList.end (); ++it)
     {
-      TcpTxItem *item = *it;
+      FlonaseTxItem *item = *it;
       m_size -= item->m_packet->GetSize ();
       delete item;
     }
 }
 
 SequenceNumber32
-TcpTxBuffer::HeadSequence (void) const
+FlonaseTxBuffer::HeadSequence (void) const
 {
   return m_firstByteSeq;
 }
 
 SequenceNumber32
-TcpTxBuffer::TailSequence (void) const
+FlonaseTxBuffer::TailSequence (void) const
 {
   return m_firstByteSeq + SequenceNumber32 (m_size);
 }
 
 uint32_t
-TcpTxBuffer::Size (void) const
+FlonaseTxBuffer::Size (void) const
 {
   return m_size;
 }
 
 uint32_t
-TcpTxBuffer::MaxBufferSize (void) const
+FlonaseTxBuffer::MaxBufferSize (void) const
 {
   return m_maxBuffer;
 }
 
 void
-TcpTxBuffer::SetMaxBufferSize (uint32_t n)
+FlonaseTxBuffer::SetMaxBufferSize (uint32_t n)
 {
   m_maxBuffer = n;
 }
 
 uint32_t
-TcpTxBuffer::Available (void) const
+FlonaseTxBuffer::Available (void) const
 {
   return m_maxBuffer - m_size;
 }
 
 void
-TcpTxBuffer::SetHeadSequence (const SequenceNumber32& seq)
+FlonaseTxBuffer::SetHeadSequence (const SequenceNumber32& seq)
 {
   NS_LOG_FUNCTION (this << seq);
   m_firstByteSeq = seq;
@@ -172,7 +172,7 @@ TcpTxBuffer::SetHeadSequence (const SequenceNumber32& seq)
 }
 
 bool
-TcpTxBuffer::Add (Ptr<Packet> p)
+FlonaseTxBuffer::Add (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
   NS_LOG_LOGIC ("Try to append " << p->GetSize () << " bytes to window starting at "
@@ -181,7 +181,7 @@ TcpTxBuffer::Add (Ptr<Packet> p)
     {
       if (p->GetSize () > 0)
         {
-          TcpTxItem *item = new TcpTxItem ();
+          FlonaseTxItem *item = new FlonaseTxItem ();
           item->m_packet = p->Copy ();
           m_appList.insert (m_appList.end (), item);
           m_size += p->GetSize ();
@@ -196,7 +196,7 @@ TcpTxBuffer::Add (Ptr<Packet> p)
 }
 
 uint32_t
-TcpTxBuffer::SizeFromSequence (const SequenceNumber32& seq) const
+FlonaseTxBuffer::SizeFromSequence (const SequenceNumber32& seq) const
 {
   NS_LOG_FUNCTION (this << seq);
   // Sequence of last byte in buffer
@@ -213,7 +213,7 @@ TcpTxBuffer::SizeFromSequence (const SequenceNumber32& seq) const
 }
 
 Ptr<Packet>
-TcpTxBuffer::CopyFromSequence (uint32_t numBytes, const SequenceNumber32& seq)
+FlonaseTxBuffer::CopyFromSequence (uint32_t numBytes, const SequenceNumber32& seq)
 {
   NS_LOG_FUNCTION (this << numBytes << seq);
 
@@ -229,7 +229,7 @@ TcpTxBuffer::CopyFromSequence (uint32_t numBytes, const SequenceNumber32& seq)
       return Create<Packet> ();
     }
 
-  TcpTxItem *outItem = nullptr;
+  FlonaseTxItem *outItem = nullptr;
 
   if (m_firstByteSeq + m_sentSize >= seq + s)
     {
@@ -257,7 +257,7 @@ TcpTxBuffer::CopyFromSequence (uint32_t numBytes, const SequenceNumber32& seq)
     {
       // Partial: a part is retransmission, the remaining data is new
       // Just return the old segment, without taking new data. Hopefully
-      // TcpSocketBase will request new data
+      // FlonaseSocketBase will request new data
 
       uint32_t amount = (m_firstByteSeq.Get ().GetValue () + m_sentSize) - seq.GetValue ();
 
@@ -275,8 +275,8 @@ TcpTxBuffer::CopyFromSequence (uint32_t numBytes, const SequenceNumber32& seq)
   return toRet;
 }
 
-TcpTxItem*
-TcpTxBuffer::GetNewSegment (uint32_t numBytes)
+FlonaseTxItem*
+FlonaseTxBuffer::GetNewSegment (uint32_t numBytes)
 {
   NS_LOG_FUNCTION (this << numBytes);
 
@@ -285,7 +285,7 @@ TcpTxBuffer::GetNewSegment (uint32_t numBytes)
   NS_LOG_INFO ("AppList start at " << startOfAppList << ", sentSize = " <<
                m_sentSize << " firstByte: " << m_firstByteSeq);
 
-  TcpTxItem *item = GetPacketFromList (m_appList, startOfAppList,
+  FlonaseTxItem *item = GetPacketFromList (m_appList, startOfAppList,
                                        numBytes, startOfAppList);
   item->m_startSeq = startOfAppList;
 
@@ -300,8 +300,8 @@ TcpTxBuffer::GetNewSegment (uint32_t numBytes)
   return item;
 }
 
-TcpTxItem*
-TcpTxBuffer::GetTransmittedSegment (uint32_t numBytes, const SequenceNumber32 &seq)
+FlonaseTxItem*
+FlonaseTxBuffer::GetTransmittedSegment (uint32_t numBytes, const SequenceNumber32 &seq)
 {
   NS_LOG_FUNCTION (this << numBytes << seq);
   NS_ASSERT (seq >= m_firstByteSeq);
@@ -341,7 +341,7 @@ TcpTxBuffer::GetTransmittedSegment (uint32_t numBytes, const SequenceNumber32 &s
         }
     }
 
-  TcpTxItem *item = GetPacketFromList (m_sentList, m_firstByteSeq, s, seq, &listEdited);
+  FlonaseTxItem *item = GetPacketFromList (m_sentList, m_firstByteSeq, s, seq, &listEdited);
 
   if (! item->m_retrans)
     {
@@ -352,8 +352,8 @@ TcpTxBuffer::GetTransmittedSegment (uint32_t numBytes, const SequenceNumber32 &s
   return item;
 }
 
-std::pair <TcpTxBuffer::PacketList::const_iterator, SequenceNumber32>
-TcpTxBuffer::FindHighestSacked () const
+std::pair <FlonaseTxBuffer::PacketList::const_iterator, SequenceNumber32>
+FlonaseTxBuffer::FindHighestSacked () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -363,7 +363,7 @@ TcpTxBuffer::FindHighestSacked () const
 
   for (auto it = m_sentList.begin (); it != m_sentList.end (); ++it)
     {
-      const TcpTxItem *item = *it;
+      const FlonaseTxItem *item = *it;
       if (item->m_sacked)
         {
           ret = std::make_pair (it, beginOfCurrentPacket);
@@ -376,7 +376,7 @@ TcpTxBuffer::FindHighestSacked () const
 
 
 void
-TcpTxBuffer::SplitItems (TcpTxItem *t1, TcpTxItem *t2, uint32_t size) const
+FlonaseTxBuffer::SplitItems (FlonaseTxItem *t1, FlonaseTxItem *t2, uint32_t size) const
 {
   NS_ASSERT (t1 != nullptr && t2 != nullptr);
   NS_LOG_FUNCTION (this << *t2 << size);
@@ -395,8 +395,8 @@ TcpTxBuffer::SplitItems (TcpTxItem *t1, TcpTxItem *t2, uint32_t size) const
   NS_LOG_INFO ("Split of size " << size << " result: t1 " << *t1 << " t2 " << *t2);
 }
 
-TcpTxItem*
-TcpTxBuffer::GetPacketFromList (PacketList &list, const SequenceNumber32 &listStartFrom,
+FlonaseTxItem*
+FlonaseTxBuffer::GetPacketFromList (PacketList &list, const SequenceNumber32 &listStartFrom,
                                 uint32_t numBytes, const SequenceNumber32 &seq,
                                 bool *listEdited) const
 {
@@ -430,8 +430,8 @@ TcpTxBuffer::GetPacketFromList (PacketList &list, const SequenceNumber32 &listSt
    */
 
   Ptr<Packet> currentPacket = nullptr;
-  TcpTxItem *currentItem = nullptr;
-  TcpTxItem *outItem = nullptr;
+  FlonaseTxItem *currentItem = nullptr;
+  FlonaseTxItem *outItem = nullptr;
   PacketList::iterator it = list.begin ();
   SequenceNumber32 beginOfCurrentPacket = listStartFrom;
 
@@ -465,7 +465,7 @@ TcpTxBuffer::GetPacketFromList (PacketList &list, const SequenceNumber32 &listSt
                            " searching for " << seq <<
                            " and now we recurse because packet ends at "
                                         << beginOfCurrentPacket + currentPacket->GetSize ());
-              TcpTxItem *firstPart = new TcpTxItem ();
+              FlonaseTxItem *firstPart = new FlonaseTxItem ();
               SplitItems (firstPart, currentItem, seq - beginOfCurrentPacket);
 
               // insert firstPart before currentItem
@@ -513,7 +513,7 @@ TcpTxBuffer::GetPacketFromList (PacketList &list, const SequenceNumber32 &listSt
                   // current > outPacket in the list. Merge current with the
                   // previous, and recurse.
                   NS_ASSERT (it != list.begin ());
-                  TcpTxItem *previous = *(--it);
+                  FlonaseTxItem *previous = *(--it);
 
                   list.erase (it);
 
@@ -531,7 +531,7 @@ TcpTxBuffer::GetPacketFromList (PacketList &list, const SequenceNumber32 &listSt
             {
               // the end is inside the current packet, but it isn't exactly
               // the packet end. Just fragment, fix the list, and return.
-              TcpTxItem *firstPart = new TcpTxItem ();
+              FlonaseTxItem *firstPart = new FlonaseTxItem ();
               SplitItems (firstPart, currentItem, numBytes);
 
               // insert firstPart before currentItem
@@ -560,7 +560,7 @@ TcpTxBuffer::GetPacketFromList (PacketList &list, const SequenceNumber32 &listSt
 
           // The current packet does not contain the requested end. Merge current
           // with the packet that follows, and recurse
-          TcpTxItem *next = (*it); // Please remember we have incremented it
+          FlonaseTxItem *next = (*it); // Please remember we have incremented it
                                    // in the previous if
 
           MergeItems (currentItem, next);
@@ -586,7 +586,7 @@ static bool AreEquals (const bool &first, const bool &second)
 }
 
 void
-TcpTxBuffer::MergeItems (TcpTxItem *t1, TcpTxItem *t2) const
+FlonaseTxBuffer::MergeItems (FlonaseTxItem *t1, FlonaseTxItem *t2) const
 {
   NS_ASSERT (t1 != nullptr && t2 != nullptr);
   NS_LOG_FUNCTION (this << *t1 << *t2);
@@ -604,14 +604,14 @@ TcpTxBuffer::MergeItems (TcpTxItem *t1, TcpTxItem *t2) const
     {
       if (t1->m_retrans)
         {
-          TcpTxBuffer *self = const_cast<TcpTxBuffer*> (this);
+          FlonaseTxBuffer *self = const_cast<FlonaseTxBuffer*> (this);
           self->m_retrans -= t1->m_packet->GetSize ();
           t1->m_retrans = false;
         }
       else
         {
           NS_ASSERT (t2->m_retrans);
-          TcpTxBuffer *self = const_cast<TcpTxBuffer*> (this);
+          FlonaseTxBuffer *self = const_cast<FlonaseTxBuffer*> (this);
           self->m_retrans -= t2->m_packet->GetSize ();
           t2->m_retrans = false;
         }
@@ -628,7 +628,7 @@ TcpTxBuffer::MergeItems (TcpTxItem *t1, TcpTxItem *t2) const
 }
 
 void
-TcpTxBuffer::RemoveFromCounts (TcpTxItem *item, uint32_t size)
+FlonaseTxBuffer::RemoveFromCounts (FlonaseTxItem *item, uint32_t size)
 {
   NS_LOG_FUNCTION (this << *item << size);
   if (item->m_sacked)
@@ -649,7 +649,7 @@ TcpTxBuffer::RemoveFromCounts (TcpTxItem *item, uint32_t size)
     }
 }
 void
-TcpTxBuffer::DiscardUpTo (const SequenceNumber32& seq)
+FlonaseTxBuffer::DiscardUpTo (const SequenceNumber32& seq)
 {
   NS_LOG_FUNCTION (this << seq);
 
@@ -677,7 +677,7 @@ TcpTxBuffer::DiscardUpTo (const SequenceNumber32& seq)
           i = m_sentList.begin ();
           NS_ASSERT (i != m_sentList.end ());
         }
-      TcpTxItem *item = *i;
+      FlonaseTxItem *item = *i;
       Ptr<Packet> p = item->m_packet;
       pktSize = p->GetSize ();
       NS_ASSERT_MSG (item->m_startSeq == m_firstByteSeq,
@@ -726,7 +726,7 @@ TcpTxBuffer::DiscardUpTo (const SequenceNumber32& seq)
 
   if (!m_sentList.empty ())
     {
-      TcpTxItem *head = m_sentList.front ();
+      FlonaseTxItem *head = m_sentList.front ();
       if (head->m_sacked)
         {
           NS_ASSERT (!head->m_lost);
@@ -759,7 +759,7 @@ TcpTxBuffer::DiscardUpTo (const SequenceNumber32& seq)
 }
 
 bool
-TcpTxBuffer::Update (const TcpOptionSack::SackList &list)
+FlonaseTxBuffer::Update (const FlonaseOptionSack::SackList &list)
 {
   NS_LOG_FUNCTION (this);
   NS_LOG_INFO ("Updating scoreboard, got " << list.size () << " blocks to analyze");
@@ -849,7 +849,7 @@ TcpTxBuffer::Update (const TcpOptionSack::SackList &list)
 }
 
 void
-TcpTxBuffer::UpdateLostCount ()
+FlonaseTxBuffer::UpdateLostCount ()
 {
   NS_LOG_FUNCTION (this);
   uint32_t sacked = 0;
@@ -867,7 +867,7 @@ TcpTxBuffer::UpdateLostCount ()
 
   for (auto it = m_highestSack.first; it != m_sentList.begin(); --it)
     {
-      TcpTxItem *item = *it;
+      FlonaseTxItem *item = *it;
       if (item->m_sacked)
         {
           sacked++;
@@ -886,7 +886,7 @@ TcpTxBuffer::UpdateLostCount ()
 
   if (sacked >= m_dupAckThresh)
     {
-      TcpTxItem *item = *m_sentList.begin ();
+      FlonaseTxItem *item = *m_sentList.begin ();
       if (!item->m_lost)
         {
           item->m_lost = true;
@@ -898,7 +898,7 @@ TcpTxBuffer::UpdateLostCount ()
 }
 
 bool
-TcpTxBuffer::IsLost (const SequenceNumber32 &seq) const
+FlonaseTxBuffer::IsLost (const SequenceNumber32 &seq) const
 {
   NS_LOG_FUNCTION (this << seq);
 
@@ -937,7 +937,7 @@ TcpTxBuffer::IsLost (const SequenceNumber32 &seq) const
 }
 
 bool
-TcpTxBuffer::NextSeg (SequenceNumber32 *seq, bool isRecovery) const
+FlonaseTxBuffer::NextSeg (SequenceNumber32 *seq, bool isRecovery) const
 {
   NS_LOG_FUNCTION (this);
   /* RFC 6675, NextSeg definition.
@@ -955,7 +955,7 @@ TcpTxBuffer::NextSeg (SequenceNumber32 *seq, bool isRecovery) const
    *     (1.c) IsLost (S2) returns true.
    */
   PacketList::const_iterator it;
-  TcpTxItem *item;
+  FlonaseTxItem *item;
   SequenceNumber32 seqPerRule3;
   bool isSeqPerRule3Valid = false;
   SequenceNumber32 beginOfCurrentPkt = m_firstByteSeq;
@@ -1024,7 +1024,7 @@ TcpTxBuffer::NextSeg (SequenceNumber32 *seq, bool isRecovery) const
    *     SHOULD be returned, and RescueRxt set to RecoveryPoint.
    *     HighRxt MUST NOT be updated.
    *
-   * This point require too much interaction between us and TcpSocketBase.
+   * This point require too much interaction between us and FlonaseSocketBase.
    * We choose to not respect the SHOULD (allowed from RFC MUST/SHOULD definition)
    */
   NS_LOG_INFO ("Can't return anything");
@@ -1032,7 +1032,7 @@ TcpTxBuffer::NextSeg (SequenceNumber32 *seq, bool isRecovery) const
 }
 
 uint32_t
-TcpTxBuffer::BytesInFlight () const
+FlonaseTxBuffer::BytesInFlight () const
 {
   NS_ASSERT_MSG (m_sackedOut + m_lostOut <= m_sentSize,
                  "Count of sacked " << m_sackedOut << " and lost " << m_lostOut <<
@@ -1054,10 +1054,10 @@ TcpTxBuffer::BytesInFlight () const
 }
 
 uint32_t
-TcpTxBuffer::BytesInFlightRFC () const
+FlonaseTxBuffer::BytesInFlightRFC () const
 {
   PacketList::const_iterator it;
-  TcpTxItem *item;
+  FlonaseTxItem *item;
   uint32_t size = 0; // "pipe" in RFC
   SequenceNumber32 beginOfCurrentPkt = m_firstByteSeq;
   uint32_t sackedOut = 0;
@@ -1118,13 +1118,13 @@ TcpTxBuffer::BytesInFlightRFC () const
 }
 
 bool
-TcpTxBuffer::IsLostRFC (const SequenceNumber32 &seq, const PacketList::const_iterator &segment) const
+FlonaseTxBuffer::IsLostRFC (const SequenceNumber32 &seq, const PacketList::const_iterator &segment) const
 {
   NS_LOG_FUNCTION (this << seq);
   uint32_t count = 0;
   uint32_t bytes = 0;
   PacketList::const_iterator it;
-  TcpTxItem *item;
+  FlonaseTxItem *item;
   Ptr<const Packet> current;
   SequenceNumber32 beginOfCurrentPacket = seq;
 
@@ -1175,7 +1175,7 @@ TcpTxBuffer::IsLostRFC (const SequenceNumber32 &seq, const PacketList::const_ite
 }
 
 void
-TcpTxBuffer::ResetRenoSack ()
+FlonaseTxBuffer::ResetRenoSack ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -1189,10 +1189,10 @@ TcpTxBuffer::ResetRenoSack ()
 }
 
 void
-TcpTxBuffer::ResetSentList ()
+FlonaseTxBuffer::ResetSentList ()
 {
   NS_LOG_FUNCTION (this);
-  TcpTxItem *item;
+  FlonaseTxItem *item;
 
   // Keep the head items; they will then marked as lost
   while (m_sentList.size () > 0)
@@ -1211,12 +1211,12 @@ TcpTxBuffer::ResetSentList ()
 }
 
 void
-TcpTxBuffer::ResetLastSegmentSent ()
+FlonaseTxBuffer::ResetLastSegmentSent ()
 {
   NS_LOG_FUNCTION (this);
   if (!m_sentList.empty ())
     {
-      TcpTxItem *item = m_sentList.back ();
+      FlonaseTxItem *item = m_sentList.back ();
 
       m_sentList.pop_back ();
       m_sentSize -= item->m_packet->GetSize ();
@@ -1230,7 +1230,7 @@ TcpTxBuffer::ResetLastSegmentSent ()
 }
 
 void
-TcpTxBuffer::SetSentListLost (bool resetSack)
+FlonaseTxBuffer::SetSentListLost (bool resetSack)
 {
   NS_LOG_FUNCTION (this);
   m_retrans = 0;
@@ -1277,7 +1277,7 @@ TcpTxBuffer::SetSentListLost (bool resetSack)
 }
 
 bool
-TcpTxBuffer::IsHeadRetransmitted () const
+FlonaseTxBuffer::IsHeadRetransmitted () const
 {
   NS_LOG_FUNCTION (this);
 
@@ -1290,7 +1290,7 @@ TcpTxBuffer::IsHeadRetransmitted () const
 }
 
 void
-TcpTxBuffer::DeleteRetransmittedFlagFromHead ()
+FlonaseTxBuffer::DeleteRetransmittedFlagFromHead ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -1308,7 +1308,7 @@ TcpTxBuffer::DeleteRetransmittedFlagFromHead ()
 }
 
 void
-TcpTxBuffer::MarkHeadAsLost ()
+FlonaseTxBuffer::MarkHeadAsLost ()
 {
   if (m_sentList.size () > 0)
     {
@@ -1337,7 +1337,7 @@ TcpTxBuffer::MarkHeadAsLost ()
 }
 
 void
-TcpTxBuffer::AddRenoSack (void)
+FlonaseTxBuffer::AddRenoSack (void)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (m_sentList.size () > 1);
@@ -1371,7 +1371,7 @@ TcpTxBuffer::AddRenoSack (void)
 }
 
 void
-TcpTxBuffer::ConsistencyCheck () const
+FlonaseTxBuffer::ConsistencyCheck () const
 {
   static const bool enable = false;
 
@@ -1409,22 +1409,22 @@ TcpTxBuffer::ConsistencyCheck () const
 }
 
 std::ostream &
-operator<< (std::ostream & os, TcpTxItem const & item)
+operator<< (std::ostream & os, FlonaseTxItem const & item)
 {
   item.Print (os);
   return os;
 }
 
 std::ostream &
-operator<< (std::ostream & os, TcpTxBuffer const & tcpTxBuf)
+operator<< (std::ostream & os, FlonaseTxBuffer const & flonaseTxBuf)
 {
-  TcpTxBuffer::PacketList::const_iterator it;
+  FlonaseTxBuffer::PacketList::const_iterator it;
   std::stringstream ss;
-  SequenceNumber32 beginOfCurrentPacket = tcpTxBuf.m_firstByteSeq;
+  SequenceNumber32 beginOfCurrentPacket = flonaseTxBuf.m_firstByteSeq;
   uint32_t sentSize = 0, appSize = 0;
 
   Ptr<Packet> p;
-  for (it = tcpTxBuf.m_sentList.begin (); it != tcpTxBuf.m_sentList.end (); ++it)
+  for (it = flonaseTxBuf.m_sentList.begin (); it != flonaseTxBuf.m_sentList.end (); ++it)
     {
       p = (*it)->m_packet;
       ss << "{";
@@ -1434,21 +1434,21 @@ operator<< (std::ostream & os, TcpTxBuffer const & tcpTxBuf)
       beginOfCurrentPacket += p->GetSize ();
     }
 
-  for (it = tcpTxBuf.m_appList.begin (); it != tcpTxBuf.m_appList.end (); ++it)
+  for (it = flonaseTxBuf.m_appList.begin (); it != flonaseTxBuf.m_appList.end (); ++it)
     {
       appSize += (*it)->m_packet->GetSize ();
     }
 
-  os << "Sent list: " << ss.str () << ", size = " << tcpTxBuf.m_sentList.size () <<
-    " Total size: " << tcpTxBuf.m_size <<
-    " m_firstByteSeq = " << tcpTxBuf.m_firstByteSeq <<
-    " m_sentSize = " << tcpTxBuf.m_sentSize <<
-    " m_retransOut = " << tcpTxBuf.m_retrans <<
-    " m_lostOut = " << tcpTxBuf.m_lostOut <<
-    " m_sackedOut = " << tcpTxBuf.m_sackedOut;
+  os << "Sent list: " << ss.str () << ", size = " << flonaseTxBuf.m_sentList.size () <<
+    " Total size: " << flonaseTxBuf.m_size <<
+    " m_firstByteSeq = " << flonaseTxBuf.m_firstByteSeq <<
+    " m_sentSize = " << flonaseTxBuf.m_sentSize <<
+    " m_retransOut = " << flonaseTxBuf.m_retrans <<
+    " m_lostOut = " << flonaseTxBuf.m_lostOut <<
+    " m_sackedOut = " << flonaseTxBuf.m_sackedOut;
 
-  NS_ASSERT (sentSize == tcpTxBuf.m_sentSize);
-  NS_ASSERT (tcpTxBuf.m_size - tcpTxBuf.m_sentSize == appSize);
+  NS_ASSERT (sentSize == flonaseTxBuf.m_sentSize);
+  NS_ASSERT (flonaseTxBuf.m_size - flonaseTxBuf.m_sentSize == appSize);
   return os;
 }
 

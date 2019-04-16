@@ -19,56 +19,56 @@
  * Documentation, test cases: Natale Patriciello <natale.patriciello@gmail.com>
  */
 
-#include "tcp-option-winscale.h"
+#include "flonase-option-winscale.h"
 #include "ns3/log.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("TcpOptionWinScale");
+NS_LOG_COMPONENT_DEFINE ("FlonaseOptionWinScale");
 
-NS_OBJECT_ENSURE_REGISTERED (TcpOptionWinScale);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseOptionWinScale);
 
-TcpOptionWinScale::TcpOptionWinScale ()
-  : TcpOption (),
+FlonaseOptionWinScale::FlonaseOptionWinScale ()
+  : FlonaseOption (),
     m_scale (0)
 {
 }
 
-TcpOptionWinScale::~TcpOptionWinScale ()
+FlonaseOptionWinScale::~FlonaseOptionWinScale ()
 {
 }
 
 TypeId
-TcpOptionWinScale::GetTypeId (void)
+FlonaseOptionWinScale::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpOptionWinScale")
-    .SetParent<TcpOption> ()
+  static TypeId tid = TypeId ("ns3::FlonaseOptionWinScale")
+    .SetParent<FlonaseOption> ()
     .SetGroupName ("Internet")
-    .AddConstructor<TcpOptionWinScale> ()
+    .AddConstructor<FlonaseOptionWinScale> ()
   ;
   return tid;
 }
 
 TypeId
-TcpOptionWinScale::GetInstanceTypeId (void) const
+FlonaseOptionWinScale::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
 void
-TcpOptionWinScale::Print (std::ostream &os) const
+FlonaseOptionWinScale::Print (std::ostream &os) const
 {
   os << static_cast<int> (m_scale);
 }
 
 uint32_t
-TcpOptionWinScale::GetSerializedSize (void) const
+FlonaseOptionWinScale::GetSerializedSize (void) const
 {
   return 3;
 }
 
 void
-TcpOptionWinScale::Serialize (Buffer::Iterator start) const
+FlonaseOptionWinScale::Serialize (Buffer::Iterator start) const
 {
   Buffer::Iterator i = start;
   i.WriteU8 (GetKind ()); // Kind
@@ -77,7 +77,7 @@ TcpOptionWinScale::Serialize (Buffer::Iterator start) const
 }
 
 uint32_t
-TcpOptionWinScale::Deserialize (Buffer::Iterator start)
+FlonaseOptionWinScale::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
@@ -98,13 +98,13 @@ TcpOptionWinScale::Deserialize (Buffer::Iterator start)
 }
 
 uint8_t
-TcpOptionWinScale::GetKind (void) const
+FlonaseOptionWinScale::GetKind (void) const
 {
-  return TcpOption::WINSCALE;
+  return FlonaseOption::WINSCALE;
 }
 
 uint8_t
-TcpOptionWinScale::GetScale (void) const
+FlonaseOptionWinScale::GetScale (void) const
 {
   NS_ASSERT (m_scale <= 14);
 
@@ -112,7 +112,7 @@ TcpOptionWinScale::GetScale (void) const
 }
 
 void
-TcpOptionWinScale::SetScale (uint8_t scale)
+FlonaseOptionWinScale::SetScale (uint8_t scale)
 {
   NS_ASSERT (scale <= 14);
 

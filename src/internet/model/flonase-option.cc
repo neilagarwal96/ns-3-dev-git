@@ -18,12 +18,12 @@
  * Author: Adrian Sai-wah Tam <adrian.sw.tam@gmail.com>
  */
 
-#include "tcp-option.h"
-#include "tcp-option-rfc793.h"
-#include "tcp-option-winscale.h"
-#include "tcp-option-ts.h"
-#include "tcp-option-sack-permitted.h"
-#include "tcp-option-sack.h"
+#include "flonase-option.h"
+#include "flonase-option-rfc793.h"
+#include "flonase-option-winscale.h"
+#include "flonase-option-ts.h"
+#include "flonase-option-sack-permitted.h"
+#include "flonase-option-sack.h"
 
 #include "ns3/type-id.h"
 #include "ns3/log.h"
@@ -32,23 +32,23 @@
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("TcpOption");
+NS_LOG_COMPONENT_DEFINE ("FlonaseOption");
 
-NS_OBJECT_ENSURE_REGISTERED (TcpOption);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseOption);
 
 
-TcpOption::TcpOption ()
+FlonaseOption::FlonaseOption ()
 {
 }
 
-TcpOption::~TcpOption ()
+FlonaseOption::~FlonaseOption ()
 {
 }
 
 TypeId
-TcpOption::GetTypeId (void)
+FlonaseOption::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpOption")
+  static TypeId tid = TypeId ("ns3::FlonaseOption")
     .SetParent<Object> ()
     .SetGroupName ("Internet")
   ;
@@ -56,31 +56,31 @@ TcpOption::GetTypeId (void)
 }
 
 TypeId
-TcpOption::GetInstanceTypeId (void) const
+FlonaseOption::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
-Ptr<TcpOption>
-TcpOption::CreateOption (uint8_t kind)
+Ptr<FlonaseOption>
+FlonaseOption::CreateOption (uint8_t kind)
 {
   struct kindToTid
   {
-    TcpOption::Kind kind;
+    FlonaseOption::Kind kind;
     TypeId tid;
   };
 
   static ObjectFactory objectFactory;
   static kindToTid toTid[] =
   {
-    { TcpOption::END,           TcpOptionEnd::GetTypeId () },
-    { TcpOption::MSS,           TcpOptionMSS::GetTypeId () },
-    { TcpOption::NOP,           TcpOptionNOP::GetTypeId () },
-    { TcpOption::TS,            TcpOptionTS::GetTypeId () },
-    { TcpOption::WINSCALE,      TcpOptionWinScale::GetTypeId () },
-    { TcpOption::SACKPERMITTED, TcpOptionSackPermitted::GetTypeId () },
-    { TcpOption::SACK,          TcpOptionSack::GetTypeId () },
-    { TcpOption::UNKNOWN,  TcpOptionUnknown::GetTypeId () }
+    { FlonaseOption::END,           FlonaseOptionEnd::GetTypeId () },
+    { FlonaseOption::MSS,           FlonaseOptionMSS::GetTypeId () },
+    { FlonaseOption::NOP,           FlonaseOptionNOP::GetTypeId () },
+    { FlonaseOption::TS,            FlonaseOptionTS::GetTypeId () },
+    { FlonaseOption::WINSCALE,      FlonaseOptionWinScale::GetTypeId () },
+    { FlonaseOption::SACKPERMITTED, FlonaseOptionSackPermitted::GetTypeId () },
+    { FlonaseOption::SACK,          FlonaseOptionSack::GetTypeId () },
+    { FlonaseOption::UNKNOWN,  FlonaseOptionUnknown::GetTypeId () }
   };
 
   for (unsigned int i = 0; i < sizeof (toTid) / sizeof (kindToTid); ++i)
@@ -88,15 +88,15 @@ TcpOption::CreateOption (uint8_t kind)
       if (toTid[i].kind == kind)
         {
           objectFactory.SetTypeId (toTid[i].tid);
-          return objectFactory.Create<TcpOption> ();
+          return objectFactory.Create<FlonaseOption> ();
         }
     }
 
-  return CreateObject<TcpOptionUnknown> ();
+  return CreateObject<FlonaseOptionUnknown> ();
 }
 
 bool
-TcpOption::IsKindKnown (uint8_t kind)
+FlonaseOption::IsKindKnown (uint8_t kind)
 {
   switch (kind)
     {
@@ -114,54 +114,54 @@ TcpOption::IsKindKnown (uint8_t kind)
   return false;
 }
 
-NS_OBJECT_ENSURE_REGISTERED (TcpOptionUnknown);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseOptionUnknown);
 
-TcpOptionUnknown::TcpOptionUnknown ()
-  : TcpOption ()
+FlonaseOptionUnknown::FlonaseOptionUnknown ()
+  : FlonaseOption ()
 {
   m_kind = 0xFF;
   m_size = 0;
 }
 
-TcpOptionUnknown::~TcpOptionUnknown ()
+FlonaseOptionUnknown::~FlonaseOptionUnknown ()
 {
 }
 
 TypeId
-TcpOptionUnknown::GetTypeId (void)
+FlonaseOptionUnknown::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpOptionUnknown")
-    .SetParent<TcpOption> ()
+  static TypeId tid = TypeId ("ns3::FlonaseOptionUnknown")
+    .SetParent<FlonaseOption> ()
     .SetGroupName ("Internet")
-    .AddConstructor<TcpOptionUnknown> ()
+    .AddConstructor<FlonaseOptionUnknown> ()
   ;
   return tid;
 }
 
 TypeId
-TcpOptionUnknown::GetInstanceTypeId (void) const
+FlonaseOptionUnknown::GetInstanceTypeId (void) const
 {
   return GetTypeId ();
 }
 
 void
-TcpOptionUnknown::Print (std::ostream &os) const
+FlonaseOptionUnknown::Print (std::ostream &os) const
 {
   os << "Unknown option";
 }
 
 uint32_t
-TcpOptionUnknown::GetSerializedSize (void) const
+FlonaseOptionUnknown::GetSerializedSize (void) const
 {
   return m_size;
 }
 
 void
-TcpOptionUnknown::Serialize (Buffer::Iterator i) const
+FlonaseOptionUnknown::Serialize (Buffer::Iterator i) const
 {
   if (m_size == 0)
     {
-      NS_LOG_WARN ("Can't Serialize an Unknown Tcp Option");
+      NS_LOG_WARN ("Can't Serialize an Unknown Flonase Option");
       return;
     }
 
@@ -171,7 +171,7 @@ TcpOptionUnknown::Serialize (Buffer::Iterator i) const
 }
 
 uint32_t
-TcpOptionUnknown::Deserialize (Buffer::Iterator start)
+FlonaseOptionUnknown::Deserialize (Buffer::Iterator start)
 {
   Buffer::Iterator i = start;
 
@@ -191,7 +191,7 @@ TcpOptionUnknown::Deserialize (Buffer::Iterator start)
 }
 
 uint8_t
-TcpOptionUnknown::GetKind (void) const
+FlonaseOptionUnknown::GetKind (void) const
 {
   return m_kind;
 }

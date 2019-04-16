@@ -17,23 +17,23 @@
  *
  * Author: Adrian Sai-wah Tam <adrian.sw.tam@gmail.com>
  */
-#ifndef TCPOPTIONRFC793_H
-#define TCPOPTIONRFC793_H
+#ifndef FLONASEOPTIONRFC793_H
+#define FLONASEOPTIONRFC793_H
 
-#include "ns3/tcp-option.h"
+#include "ns3/flonase-option.h"
 
 namespace ns3 {
 
 /**
- * \ingroup tcp
+ * \ingroup flonase
  *
- * Defines the TCP option of kind 0 (end of option list) as in \RFC{793}
+ * Defines the FLONASE option of kind 0 (end of option list) as in \RFC{793}
  */
-class TcpOptionEnd : public TcpOption
+class FlonaseOptionEnd : public FlonaseOption
 {
 public:
-  TcpOptionEnd ();
-  virtual ~TcpOptionEnd ();
+  FlonaseOptionEnd ();
+  virtual ~FlonaseOptionEnd ();
 
   /**
    * \brief Get the type ID.
@@ -52,13 +52,13 @@ public:
 };
 
 /**
- * Defines the TCP option of kind 1 (no operation) as in \RFC{793}
+ * Defines the FLONASE option of kind 1 (no operation) as in \RFC{793}
  */
-class TcpOptionNOP : public TcpOption
+class FlonaseOptionNOP : public FlonaseOption
 {
 public:
-  TcpOptionNOP ();
-  virtual ~TcpOptionNOP ();
+  FlonaseOptionNOP ();
+  virtual ~FlonaseOptionNOP ();
 
   /**
    * \brief Get the type ID.
@@ -76,13 +76,13 @@ public:
 };
 
 /**
- * Defines the TCP option of kind 2 (maximum segment size) as in \RFC{793}
+ * Defines the FLONASE option of kind 2 (maximum segment size) as in \RFC{793}
  */
-class TcpOptionMSS : public TcpOption
+class FlonaseOptionMSS : public FlonaseOption
 {
 public:
-  TcpOptionMSS ();
-  virtual ~TcpOptionMSS ();
+  FlonaseOptionMSS ();
+  virtual ~FlonaseOptionMSS ();
 
   /**
    * \brief Get the type ID.
@@ -115,4 +115,4 @@ protected:
 
 } // namespace ns3
 
-#endif // TCPOPTIONRFC793_H
+#endif // FLONASEOPTIONRFC793_H

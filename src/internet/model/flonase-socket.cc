@@ -27,108 +27,108 @@
 #include "ns3/boolean.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/nstime.h"
-#include "tcp-socket.h"
+#include "flonase-socket.h"
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("TcpSocket");
+NS_LOG_COMPONENT_DEFINE ("FlonaseSocket");
 
-NS_OBJECT_ENSURE_REGISTERED (TcpSocket);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseSocket);
 
 const char* const
-TcpSocket::TcpStateName[TcpSocket::LAST_STATE] = { "CLOSED", "LISTEN", "SYN_SENT",
+FlonaseSocket::FlonaseStateName[FlonaseSocket::LAST_STATE] = { "CLOSED", "LISTEN", "SYN_SENT",
                                         "SYN_RCVD", "ESTABLISHED", "CLOSE_WAIT",
                                         "LAST_ACK", "FIN_WAIT_1", "FIN_WAIT_2",
                                         "CLOSING", "TIME_WAIT" };
 
 TypeId
-TcpSocket::GetTypeId (void)
+FlonaseSocket::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpSocket")
+  static TypeId tid = TypeId ("ns3::FlonaseSocket")
     .SetParent<Socket> ()
     .SetGroupName ("Internet")
     .AddAttribute ("SndBufSize",
-                   "TcpSocket maximum transmit buffer size (bytes)",
+                   "FlonaseSocket maximum transmit buffer size (bytes)",
                    UintegerValue (131072), // 128k
-                   MakeUintegerAccessor (&TcpSocket::GetSndBufSize,
-                                         &TcpSocket::SetSndBufSize),
+                   MakeUintegerAccessor (&FlonaseSocket::GetSndBufSize,
+                                         &FlonaseSocket::SetSndBufSize),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("RcvBufSize",
-                   "TcpSocket maximum receive buffer size (bytes)",
+                   "FlonaseSocket maximum receive buffer size (bytes)",
                    UintegerValue (131072),
-                   MakeUintegerAccessor (&TcpSocket::GetRcvBufSize,
-                                         &TcpSocket::SetRcvBufSize),
+                   MakeUintegerAccessor (&FlonaseSocket::GetRcvBufSize,
+                                         &FlonaseSocket::SetRcvBufSize),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("SegmentSize",
-                   "TCP maximum segment size in bytes (may be adjusted based on MTU discovery)",
+                   "FLONASE maximum segment size in bytes (may be adjusted based on MTU discovery)",
                    UintegerValue (536),
-                   MakeUintegerAccessor (&TcpSocket::GetSegSize,
-                                         &TcpSocket::SetSegSize),
+                   MakeUintegerAccessor (&FlonaseSocket::GetSegSize,
+                                         &FlonaseSocket::SetSegSize),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("InitialSlowStartThreshold",
-                   "TCP initial slow start threshold (bytes)",
+                   "FLONASE initial slow start threshold (bytes)",
                    UintegerValue (UINT32_MAX),
-                   MakeUintegerAccessor (&TcpSocket::GetInitialSSThresh,
-                                         &TcpSocket::SetInitialSSThresh),
+                   MakeUintegerAccessor (&FlonaseSocket::GetInitialSSThresh,
+                                         &FlonaseSocket::SetInitialSSThresh),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("InitialCwnd",
-                   "TCP initial congestion window size (segments)",
+                   "FLONASE initial congestion window size (segments)",
                    UintegerValue (1),
-                   MakeUintegerAccessor (&TcpSocket::GetInitialCwnd,
-                                         &TcpSocket::SetInitialCwnd),
+                   MakeUintegerAccessor (&FlonaseSocket::GetInitialCwnd,
+                                         &FlonaseSocket::SetInitialCwnd),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("ConnTimeout",
-                   "TCP retransmission timeout when opening connection (seconds)",
+                   "FLONASE retransmission timeout when opening connection (seconds)",
                    TimeValue (Seconds (3)),
-                   MakeTimeAccessor (&TcpSocket::GetConnTimeout,
-                                     &TcpSocket::SetConnTimeout),
+                   MakeTimeAccessor (&FlonaseSocket::GetConnTimeout,
+                                     &FlonaseSocket::SetConnTimeout),
                    MakeTimeChecker ())
     .AddAttribute ("ConnCount",
                    "Number of connection attempts (SYN retransmissions) before "
                    "returning failure",
                    UintegerValue (6),
-                   MakeUintegerAccessor (&TcpSocket::GetSynRetries,
-                                         &TcpSocket::SetSynRetries),
+                   MakeUintegerAccessor (&FlonaseSocket::GetSynRetries,
+                                         &FlonaseSocket::SetSynRetries),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("DataRetries",
                    "Number of data retransmission attempts",
                    UintegerValue (6),
-                   MakeUintegerAccessor (&TcpSocket::GetDataRetries,
-                                         &TcpSocket::SetDataRetries),
+                   MakeUintegerAccessor (&FlonaseSocket::GetDataRetries,
+                                         &FlonaseSocket::SetDataRetries),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("DelAckTimeout",
-                   "Timeout value for TCP delayed acks, in seconds",
+                   "Timeout value for FLONASE delayed acks, in seconds",
                    TimeValue (Seconds (0.2)),
-                   MakeTimeAccessor (&TcpSocket::GetDelAckTimeout,
-                                     &TcpSocket::SetDelAckTimeout),
+                   MakeTimeAccessor (&FlonaseSocket::GetDelAckTimeout,
+                                     &FlonaseSocket::SetDelAckTimeout),
                    MakeTimeChecker ())
     .AddAttribute ("DelAckCount",
-                   "Number of packets to wait before sending a TCP ack",
+                   "Number of packets to wait before sending a FLONASE ack",
                    UintegerValue (2),
-                   MakeUintegerAccessor (&TcpSocket::GetDelAckMaxCount,
-                                         &TcpSocket::SetDelAckMaxCount),
+                   MakeUintegerAccessor (&FlonaseSocket::GetDelAckMaxCount,
+                                         &FlonaseSocket::SetDelAckMaxCount),
                    MakeUintegerChecker<uint32_t> ())
-    .AddAttribute ("TcpNoDelay", "Set to true to disable Nagle's algorithm",
+    .AddAttribute ("FlonaseNoDelay", "Set to true to disable Nagle's algorithm",
                    BooleanValue (true),
-                   MakeBooleanAccessor (&TcpSocket::GetTcpNoDelay,
-                                        &TcpSocket::SetTcpNoDelay),
+                   MakeBooleanAccessor (&FlonaseSocket::GetFlonaseNoDelay,
+                                        &FlonaseSocket::SetFlonaseNoDelay),
                    MakeBooleanChecker ())
     .AddAttribute ("PersistTimeout",
                    "Persist timeout to probe for rx window",
                    TimeValue (Seconds (6)),
-                   MakeTimeAccessor (&TcpSocket::GetPersistTimeout,
-                                     &TcpSocket::SetPersistTimeout),
+                   MakeTimeAccessor (&FlonaseSocket::GetPersistTimeout,
+                                     &FlonaseSocket::SetPersistTimeout),
                    MakeTimeChecker ())
   ;
   return tid;
 }
 
-TcpSocket::TcpSocket ()
+FlonaseSocket::FlonaseSocket ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }
 
-TcpSocket::~TcpSocket ()
+FlonaseSocket::~FlonaseSocket ()
 {
   NS_LOG_FUNCTION_NOARGS ();
 }

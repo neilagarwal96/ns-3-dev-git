@@ -17,18 +17,18 @@
  *
  * Author: Raj Bhattacharjea <raj.b@gatech.edu>
  */
-#include "tcp-socket-factory.h"
+#include "flonase-socket-factory.h"
 #include "ns3/uinteger.h"
 #include "ns3/double.h"
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED (TcpSocketFactory);
+NS_OBJECT_ENSURE_REGISTERED (FlonaseSocketFactory);
 
 TypeId
-TcpSocketFactory::GetTypeId (void)
+FlonaseSocketFactory::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::TcpSocketFactory")
+  static TypeId tid = TypeId ("ns3::FlonaseSocketFactory")
     .SetParent<SocketFactory> ()
     .SetGroupName ("Internet")
   ;

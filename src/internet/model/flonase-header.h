@@ -18,14 +18,14 @@
  * Author: Raj Bhattacharjea <raj.b@gatech.edu>
  */
 
-#ifndef TCP_HEADER_H
-#define TCP_HEADER_H
+#ifndef FLONASE_HEADER_H
+#define FLONASE_HEADER_H
 
 #include <stdint.h>
 #include "ns3/header.h"
-#include "ns3/tcp-option.h"
+#include "ns3/flonase-option.h"
 #include "ns3/buffer.h"
-#include "ns3/tcp-socket-factory.h"
+#include "ns3/flonase-socket-factory.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/ipv6-address.h"
 #include "ns3/sequence-number.h"
@@ -33,42 +33,42 @@
 namespace ns3 {
 
 /**
- * \ingroup tcp
+ * \ingroup flonase
  * \brief Header for the Transmission Control Protocol
  *
- * This class has fields corresponding to those in a network TCP header
+ * This class has fields corresponding to those in a network FLONASE header
  * (port numbers, sequence and acknowledgement numbers, flags, etc) as well
  * as methods for serialization to and deserialization from a byte buffer.
  */
 
-class TcpHeader : public Header
+class FlonaseHeader : public Header
 {
 public:
-  TcpHeader ();
-  virtual ~TcpHeader ();
+  FlonaseHeader ();
+  virtual ~FlonaseHeader ();
 
-  typedef std::list< Ptr<const TcpOption> > TcpOptionList; //!< List of TcpOption
+  typedef std::list< Ptr<const FlonaseOption> > FlonaseOptionList; //!< List of FlonaseOption
 
   /**
-   * \brief Print a TCP header into an output stream
+   * \brief Print a FLONASE header into an output stream
    *
    * \param os output stream
-   * \param tc TCP header to print
+   * \param tc FLONASE header to print
    * \return The ostream passed as first argument
    */
-  friend std::ostream& operator<< (std::ostream& os, TcpHeader const & tc);
+  friend std::ostream& operator<< (std::ostream& os, FlonaseHeader const & tc);
 
   /**
-   * \brief Converts an integer into a human readable list of Tcp flags
+   * \brief Converts an integer into a human readable list of Flonase flags
    *
-   * \param flags Bitfield of TCP flags to convert to a readable string
+   * \param flags Bitfield of FLONASE flags to convert to a readable string
    * \param delimiter String to insert between flags
    *
    * FIN=0x1, SYN=0x2, RST=0x4, PSH=0x8, ACK=0x10, URG=0x20, ECE=0x40, CWR=0x80
-   * TcpHeader::FlagsToString (0x1) should return the following string;
+   * FlonaseHeader::FlagsToString (0x1) should return the following string;
    *     "FIN"
    *
-   * TcpHeader::FlagsToString (0xff) should return the following string;
+   * FlonaseHeader::FlagsToString (0xff) should return the following string;
    *     "FIN|SYN|RST|PSH|ACK|URG|ECE|CWR";
    *
    * \return the generated string
@@ -76,7 +76,7 @@ public:
   static std::string FlagsToString (uint8_t flags, const std::string& delimiter = "|");
 
   /**
-   * \brief Enable checksum calculation for TCP
+   * \brief Enable checksum calculation for FLONASE
    *
    * \todo currently has no effect
    */
@@ -86,43 +86,43 @@ public:
 
 /**
  * \brief Set the source port
- * \param port The source port for this TcpHeader
+ * \param port The source port for this FlonaseHeader
  */
   void SetSourcePort (uint16_t port);
 
   /**
    * \brief Set the destination port
-   * \param port the destination port for this TcpHeader
+   * \param port the destination port for this FlonaseHeader
    */
   void SetDestinationPort (uint16_t port);
 
   /**
    * \brief Set the sequence Number
-   * \param sequenceNumber the sequence number for this TcpHeader
+   * \param sequenceNumber the sequence number for this FlonaseHeader
    */
   void SetSequenceNumber (SequenceNumber32 sequenceNumber);
 
   /**
    * \brief Set the ACK number
-   * \param ackNumber the ACK number for this TcpHeader
+   * \param ackNumber the ACK number for this FlonaseHeader
    */
   void SetAckNumber (SequenceNumber32 ackNumber);
 
   /**
    * \brief Set flags of the header
-   * \param flags the flags for this TcpHeader
+   * \param flags the flags for this FlonaseHeader
    */
   void SetFlags (uint8_t flags);
 
   /**
    * \brief Set the window size
-   * \param windowSize the window size for this TcpHeader
+   * \param windowSize the window size for this FlonaseHeader
    */
   void SetWindowSize (uint16_t windowSize);
 
   /**
    * \brief Set the urgent pointer
-   * \param urgentPointer the urgent pointer for this TcpHeader
+   * \param urgentPointer the urgent pointer for this FlonaseHeader
    */
   void SetUrgentPointer (uint16_t urgentPointer);
 
@@ -130,53 +130,53 @@ public:
 
   /**
    * \brief Get the source port
-   * \return The source port for this TcpHeader
+   * \return The source port for this FlonaseHeader
    */
   uint16_t GetSourcePort () const;
 
   /**
    * \brief Get the destination port
-   * \return the destination port for this TcpHeader
+   * \return the destination port for this FlonaseHeader
    */
   uint16_t GetDestinationPort () const;
 
   /**
    * \brief Get the sequence number
-   * \return the sequence number for this TcpHeader
+   * \return the sequence number for this FlonaseHeader
    */
   SequenceNumber32 GetSequenceNumber () const;
 
   /**
    * \brief Get the ACK number
-   * \return the ACK number for this TcpHeader
+   * \return the ACK number for this FlonaseHeader
    */
   SequenceNumber32 GetAckNumber () const;
 
   /**
    * \brief Get the length in words
    *
-   * A word is 4 bytes; without Tcp Options, header is 5 words (20 bytes).
+   * A word is 4 bytes; without Flonase Options, header is 5 words (20 bytes).
    * With options, it can reach up to 15 words (60 bytes).
    *
-   * \return the length of this TcpHeader
+   * \return the length of this FlonaseHeader
    */
   uint8_t GetLength () const;
 
   /**
    * \brief Get the flags
-   * \return the flags for this TcpHeader
+   * \return the flags for this FlonaseHeader
    */
   uint8_t GetFlags () const;
 
   /**
    * \brief Get the window size
-   * \return the window size for this TcpHeader
+   * \return the window size for this FlonaseHeader
    */
   uint16_t GetWindowSize () const;
 
   /**
    * \brief Get the urgent pointer
-   * \return the urgent pointer for this TcpHeader
+   * \return the urgent pointer for this FlonaseHeader
    */
   uint16_t GetUrgentPointer () const;
 
@@ -185,17 +185,17 @@ public:
    * \param kind the option to retrieve
    * \return Whether the header contains a specific kind of option, or 0
    */
-  Ptr<const TcpOption> GetOption (uint8_t kind) const;
+  Ptr<const FlonaseOption> GetOption (uint8_t kind) const;
 
   /**
    * \brief Get the list of option in this header
    * \return a const reference to the option list
    */
-  const TcpOptionList& GetOptionList (void) const;
+  const FlonaseOptionList& GetOptionList (void) const;
 
   /**
    * \brief Get the total length of appended options
-   * \return the total length of options appended to this TcpHeader
+   * \return the total length of options appended to this FlonaseHeader
    */
   uint8_t GetOptionLength () const;
 
@@ -213,16 +213,16 @@ public:
   bool HasOption (uint8_t kind) const;
 
   /**
-   * \brief Append an option to the TCP header
+   * \brief Append an option to the FLONASE header
    * \param option The option to append
    * \return true if option has been appended, false otherwise
    */
-  bool AppendOption (Ptr<const TcpOption> option);
+  bool AppendOption (Ptr<const FlonaseOption> option);
 
   /**
-   * \brief Initialize the TCP checksum.
+   * \brief Initialize the FLONASE checksum.
    *
-   * If you want to use tcp checksums, you should call this
+   * If you want to use flonase checksums, you should call this
    * method prior to adding the header to a packet.
    *
    * \param source the IP source to use in the underlying
@@ -238,9 +238,9 @@ public:
                            uint8_t protocol);
 
   /**
-   * \brief Initialize the TCP checksum.
+   * \brief Initialize the FLONASE checksum.
    *
-   * If you want to use tcp checksums, you should call this
+   * If you want to use flonase checksums, you should call this
    * method prior to adding the header to a packet.
    *
    * \param source the IP source to use in the underlying
@@ -256,9 +256,9 @@ public:
                            uint8_t protocol);
 
   /**
-   * \brief Initialize the TCP checksum.
+   * \brief Initialize the FLONASE checksum.
    *
-   * If you want to use tcp checksums, you should call this
+   * If you want to use flonase checksums, you should call this
    * method prior to adding the header to a packet.
    *
    * \param source the IP source to use in the underlying
@@ -274,7 +274,7 @@ public:
                            uint8_t protocol);
 
   /**
-   * \brief TCP flag field values
+   * \brief FLONASE flag field values
    */
   typedef enum
   {
@@ -301,7 +301,7 @@ public:
   virtual uint32_t Deserialize (Buffer::Iterator start);
 
   /**
-   * \brief Is the TCP checksum correct ?
+   * \brief Is the FLONASE checksum correct ?
    * \returns true if the checksum is correct, false otherwise.
    */
   bool IsChecksumOk (void) const;
@@ -312,7 +312,7 @@ public:
    * \param rhs right operand
    * \return true if the operands are equal
    */
-  friend bool operator== (const TcpHeader &lhs, const TcpHeader &rhs);
+  friend bool operator== (const FlonaseHeader &lhs, const FlonaseHeader &rhs);
 
 private:
   /**
@@ -349,10 +349,10 @@ private:
   bool m_goodChecksum;    //!< Flag to indicate that checksum is correct
 
   static const uint8_t m_maxOptionsLen = 40;         //!< Maximum options length
-  TcpOptionList m_options;     //!< TcpOption present in the header
-  uint8_t m_optionsLen;        //!< Tcp options length.
+  FlonaseOptionList m_options;     //!< FlonaseOption present in the header
+  uint8_t m_optionsLen;        //!< Flonase options length.
 };
 
 } // namespace ns3
 
-#endif /* TCP_HEADER */
+#endif /* FLONASE_HEADER */

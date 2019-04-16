@@ -18,24 +18,24 @@
  * Author: Adrian Sai-wah Tam <adrian.sw.tam@gmail.com>
  */
 
-#ifndef TCP_RX_BUFFER_H
-#define TCP_RX_BUFFER_H
+#ifndef FLONASE_RX_BUFFER_H
+#define FLONASE_RX_BUFFER_H
 
 #include <map>
 #include "ns3/traced-value.h"
 #include "ns3/trace-source-accessor.h"
 #include "ns3/sequence-number.h"
 #include "ns3/ptr.h"
-#include "ns3/tcp-header.h"
-#include "ns3/tcp-option-sack.h"
+#include "ns3/flonase-header.h"
+#include "ns3/flonase-option-sack.h"
 
 namespace ns3 {
 class Packet;
 
 /**
- * \ingroup tcp
+ * \ingroup flonase
  *
- * \brief Rx reordering buffer for TCP
+ * \brief Rx reordering buffer for FLONASE
  *
  * The class is responsible to safely store the segments, and then
  * returning them in-order to the application, where "in-order" does not means
@@ -70,7 +70,7 @@ class Packet;
  * \see GetSackList
  * \see UpdateSackList
  */
-class TcpRxBuffer : public Object
+class FlonaseRxBuffer : public Object
 {
 public:
   /**
@@ -82,8 +82,8 @@ public:
    * \brief Constructor
    * \param n initial Sequence number to be received
    */
-  TcpRxBuffer (uint32_t n = 0);
-  virtual ~TcpRxBuffer ();
+  FlonaseRxBuffer (uint32_t n = 0);
+  virtual ~FlonaseRxBuffer ();
 
   // Accessors
   /**
@@ -92,8 +92,8 @@ public:
    */
   SequenceNumber32 NextRxSequence (void) const;
   /**
-   * \brief Get the lowest sequence number that this TcpRxBuffer cannot accept
-   * \returns the lowest sequence number that this TcpRxBuffer cannot accept
+   * \brief Get the lowest sequence number that this FlonaseRxBuffer cannot accept
+   * \returns the lowest sequence number that this FlonaseRxBuffer cannot accept
    */
   SequenceNumber32 MaxRxSequence (void) const;
   /**
@@ -144,10 +144,10 @@ public:
    * packet
    *
    * \param p packet
-   * \param tcph packet's TCP header
+   * \param flonaseh packet's FLONASE header
    * \return True when success, false otherwise.
    */
-  bool Add (Ptr<Packet> p, TcpHeader const& tcph);
+  bool Add (Ptr<Packet> p, FlonaseHeader const& flonaseh);
 
   /**
    * Extract data from the head of the buffer as indicated by nextRxSeq.
@@ -166,7 +166,7 @@ public:
    *
    * \return a list of isolated blocks
    */
-  TcpOptionSack::SackList GetSackList () const;
+  FlonaseOptionSack::SackList GetSackList () const;
 
   /**
    * \brief Get the size of Sack list
@@ -215,7 +215,7 @@ private:
    */
   void ClearSackList (const SequenceNumber32 &seq);
 
-  TcpOptionSack::SackList m_sackList; //!< Sack list (updated constantly)
+  FlonaseOptionSack::SackList m_sackList; //!< Sack list (updated constantly)
 
   /// container for data stored in the buffer
   typedef std::map<SequenceNumber32, Ptr<Packet> >::iterator BufIterator;
@@ -230,4 +230,4 @@ private:
 
 } //namespace ns3
 
-#endif /* TCP_RX_BUFFER_H */
+#endif /* FLONASE_RX_BUFFER_H */
