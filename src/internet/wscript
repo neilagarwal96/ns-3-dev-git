@@ -321,7 +321,7 @@ def build(bld):
     headers.source = [
         'model/flonase-header.h',
         'model/flonase-l4-protocol.h',
-        'model/flonase-socket-factory-impl.h',
+        # 'model/flonase-socket-factory-impl.h',
         'model/flonase-socket-base.h',
         'model/flonase-socket-state.h',
         'model/flonase-congestion-ops.h',

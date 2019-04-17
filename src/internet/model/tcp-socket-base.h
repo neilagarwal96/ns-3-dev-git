@@ -1291,8 +1291,8 @@ typedef void (* TcpCongStatesTracedValueCallback)(const TcpSocketState::TcpCongS
  * \param [in] oldValue original value of the traced variable
  * \param [in] newValue new value of the traced variable
  */
-typedef void (* EcnStatesTracedValueCallback)(const TcpSocketState::EcnState_t oldValue,
-                                                  const TcpSocketState::EcnState_t newValue);
+// typedef void (* EcnStatesTracedValueCallback)(const TcpSocketState::EcnState_t oldValue,
+//                                                   const TcpSocketState::EcnState_t newValue);
 
 } // namespace ns3
 

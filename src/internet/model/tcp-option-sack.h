@@ -94,8 +94,8 @@ public:
 
   friend std::ostream & operator<< (std::ostream & os, TcpOptionSack const & sackOption);
 
-  friend std::ostream & operator<< (std::ostream & os,
-                             TcpOptionSack::SackBlock const & sackBlock);
+  // friend std::ostream & operator<< (std::ostream & os,
+                             // TcpOptionSack::SackBlock const & sackBlock);
 
 
 protected:
@@ -108,8 +108,10 @@ protected:
  * \param sackOption the option to print.
  * \returns The output stream.
  */
-std::ostream & operator<< (std::ostream & os,
-                           TcpOptionSack const & sackOption);
+// inline std::ostream & operator<< (std::ostream & os, TcpOptionSack const & sackOption)
+// {
+//   return os;
+// }
 
 /**
  * \brief Output operator.
@@ -117,8 +119,10 @@ std::ostream & operator<< (std::ostream & os,
  * \param sackBlock the block to print.
  * \returns The output stream.
  */
-std::ostream & operator<< (std::ostream & os,
-                           TcpOptionSack::SackBlock const & sackBlock);
+inline std::ostream & operator<< (std::ostream & os, TcpOptionSack::SackBlock const & sackBlock)
+{
+  return os;
+}
 
 inline std::ostream &
 operator<< (std::ostream & os, TcpOptionSack const & sackOption)
@@ -133,15 +137,15 @@ operator<< (std::ostream & os, TcpOptionSack const & sackOption)
   os << ss.str ();
   return os;
 }
-
-inline std::ostream &
-operator<< (std::ostream & os, TcpOptionSack::SackBlock const & sackBlock)
-{
-  std::stringstream ss;
-  ss << "[" << sackBlock.first << ";" << sackBlock.second << "]";
-  os << ss.str ();
-  return os;
-}
+//
+// inline std::ostream &
+// operator<< (std::ostream & os, TcpOptionSack::SackBlock const & sackBlock)
+// {
+//   std::stringstream ss;
+//   ss << "[" << sackBlock.first << ";" << sackBlock.second << "]";
+//   os << ss.str ();
+//   return os;
+// }
 
 } // namespace ns3
 

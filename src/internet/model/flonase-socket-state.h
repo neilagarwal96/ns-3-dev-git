@@ -194,8 +194,8 @@ namespace TracedValueCallback {
    * \param [in] oldValue original value of the traced variable
    * \param [in] newValue new value of the traced variable
    */
-  typedef void (* EcnState)(const FlonaseSocketState::EcnState_t oldValue,
-                            const FlonaseSocketState::EcnState_t newValue);
+  // typedef void (* EcnState)(const FlonaseSocketState::EcnState_t oldValue,
+  //                           const FlonaseSocketState::EcnState_t newValue);
 
 }  // namespace TracedValueCallback
 

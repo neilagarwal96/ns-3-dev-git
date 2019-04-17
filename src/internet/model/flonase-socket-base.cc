@@ -170,10 +170,10 @@ FlonaseSocketBase::GetTypeId (void)
                      "FLONASE Congestion machine state",
                      MakeTraceSourceAccessor (&FlonaseSocketBase::m_congStateTrace),
                      "ns3::FlonaseSocketState::FlonaseCongStatesTracedValueCallback")
-    .AddTraceSource ("EcnState",
-                     "Trace ECN state change of socket",
-                     MakeTraceSourceAccessor (&FlonaseSocketBase::m_ecnStateTrace),
-                     "ns3::FlonaseSocketState::EcnStatesTracedValueCallback")
+    // .AddTraceSource ("EcnState",
+    //                  "Trace ECN state change of socket",
+    //                  MakeTraceSourceAccessor (&FlonaseSocketBase::m_ecnStateTrace),
+    //                  "ns3::FlonaseSocketState::EcnStatesTracedValueCallback")
     .AddTraceSource ("AdvWND",
                      "Advertised Window Size",
                      MakeTraceSourceAccessor (&FlonaseSocketBase::m_advWnd),
@@ -1122,7 +1122,7 @@ FlonaseSocketBase::ForwardUp (Ptr<Packet> packet, Ipv4Header header, uint16_t po
   if (header.GetEcn() == Ipv4Header::ECN_CE && m_ecnCESeq < flonaseHeader.GetSequenceNumber ())
     {
       NS_LOG_INFO ("Received CE flag is valid");
-      NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_CE_RCVD");
+      // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_CE_RCVD");
       m_ecnCESeq = flonaseHeader.GetSequenceNumber ();
       m_tcb->m_ecnState = FlonaseSocketState::ECN_CE_RCVD;
       m_congestionControl->CwndEvent (m_tcb, FlonaseSocketState::CA_EVENT_ECN_IS_CE);
@@ -1161,7 +1161,7 @@ FlonaseSocketBase::ForwardUp6 (Ptr<Packet> packet, Ipv6Header header, uint16_t p
   if (header.GetEcn() == Ipv6Header::ECN_CE && m_ecnCESeq < flonaseHeader.GetSequenceNumber ())
     {
       NS_LOG_INFO ("Received CE flag is valid");
-      NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_CE_RCVD");
+      // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_CE_RCVD");
       m_ecnCESeq = flonaseHeader.GetSequenceNumber ();
       m_tcb->m_ecnState = FlonaseSocketState::ECN_CE_RCVD;
       m_congestionControl->CwndEvent (m_tcb, FlonaseSocketState::CA_EVENT_ECN_IS_CE);
@@ -1249,7 +1249,7 @@ FlonaseSocketBase::DoForwardUp (Ptr<Packet> packet, const Address &fromAddress,
           //
           if (m_tcb->m_ecnState != FlonaseSocketState::ECN_CE_RCVD)
             {
-              NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_IDLE");
+              // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_IDLE");
               m_tcb->m_ecnState = FlonaseSocketState::ECN_IDLE;
             }
         }
@@ -1439,7 +1439,7 @@ FlonaseSocketBase::ProcessEstablished (Ptr<Packet> packet, const FlonaseHeader& 
           if (m_tcb->m_ecnState == FlonaseSocketState::ECN_CE_RCVD || m_tcb->m_ecnState == FlonaseSocketState::ECN_SENDING_ECE)
             {
               SendEmptyPacket (FlonaseHeader::ACK | FlonaseHeader::ECE);
-              NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_SENDING_ECE");
+              // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_SENDING_ECE");
               m_tcb->m_ecnState = FlonaseSocketState::ECN_SENDING_ECE;
             }
           else
@@ -1693,7 +1693,7 @@ FlonaseSocketBase::ReceivedAck (Ptr<Packet> packet, const FlonaseHeader& flonase
         {
           NS_LOG_INFO ("Received ECN Echo is valid");
           m_ecnEchoSeq = ackNumber;
-          NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_ECE_RCVD");
+          // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_ECE_RCVD");
           m_tcb->m_ecnState = FlonaseSocketState::ECN_ECE_RCVD;
         }
     }
@@ -2047,7 +2047,7 @@ FlonaseSocketBase::ProcessSynSent (Ptr<Packet> packet, const FlonaseHeader& flon
         {
           NS_LOG_INFO ("Received ECN SYN packet");
           SendEmptyPacket (FlonaseHeader::SYN | FlonaseHeader::ACK | FlonaseHeader::ECE);
-          NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_IDLE");
+          // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_IDLE");
           m_tcb->m_ecnState = FlonaseSocketState::ECN_IDLE;
         }
       else
@@ -2075,7 +2075,7 @@ FlonaseSocketBase::ProcessSynSent (Ptr<Packet> packet, const FlonaseHeader& flon
       if (m_ecnMode == EcnMode_t::ClassicEcn && (flonaseflags & (FlonaseHeader::CWR | FlonaseHeader::ECE)) == (FlonaseHeader::ECE))
         {
           NS_LOG_INFO ("Received ECN SYN-ACK packet.");
-          NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_IDLE");
+          // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_IDLE");
           m_tcb->m_ecnState = FlonaseSocketState::ECN_IDLE;
         }
       else
@@ -2155,7 +2155,7 @@ FlonaseSocketBase::ProcessSynRcvd (Ptr<Packet> packet, const FlonaseHeader& flon
         {
           NS_LOG_INFO ("Received ECN SYN packet");
           SendEmptyPacket (FlonaseHeader::SYN | FlonaseHeader::ACK |FlonaseHeader::ECE);
-          NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_IDLE");
+          // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_IDLE");
           m_tcb->m_ecnState = FlonaseSocketState::ECN_IDLE;
        }
       else
@@ -2720,7 +2720,7 @@ FlonaseSocketBase::CompleteFork (Ptr<Packet> p, const FlonaseHeader& h,
   if (m_ecnMode == EcnMode_t::ClassicEcn && (h.GetFlags () & (FlonaseHeader::CWR | FlonaseHeader::ECE)) == (FlonaseHeader::CWR | FlonaseHeader::ECE))
     {
       SendEmptyPacket (FlonaseHeader::SYN | FlonaseHeader::ACK | FlonaseHeader::ECE);
-      NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_IDLE");
+      // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_IDLE");
       m_tcb->m_ecnState = FlonaseSocketState::ECN_IDLE;
     }
   else
@@ -2875,7 +2875,7 @@ FlonaseSocketBase::SendDataPacket (SequenceNumber32 seq, uint32_t maxSize, bool 
       m_tcb->m_cWndInfl = m_tcb->m_cWnd;
       flags |= FlonaseHeader::CWR;
       m_ecnCWRSeq = seq;
-      NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_CWR_SENT");
+      // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_CWR_SENT");
       m_tcb->m_ecnState = FlonaseSocketState::ECN_CWR_SENT;
       NS_LOG_INFO ("CWR flags set");
       NS_LOG_DEBUG (FlonaseSocketState::FlonaseCongStateName[m_tcb->m_congState] << " -> CA_CWR");
@@ -3237,7 +3237,7 @@ FlonaseSocketBase::ReceivedData (Ptr<Packet> p, const FlonaseHeader& flonaseHead
       if (m_tcb->m_ecnState == FlonaseSocketState::ECN_CE_RCVD || m_tcb->m_ecnState == FlonaseSocketState::ECN_SENDING_ECE)
         {
           SendEmptyPacket (FlonaseHeader::ACK | FlonaseHeader::ECE);
-          NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_SENDING_ECE");
+          // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_SENDING_ECE");
           m_tcb->m_ecnState = FlonaseSocketState::ECN_SENDING_ECE;
         }
       else
@@ -3273,7 +3273,7 @@ FlonaseSocketBase::ReceivedData (Ptr<Packet> p, const FlonaseHeader& flonaseHead
       if (m_tcb->m_ecnState == FlonaseSocketState::ECN_CE_RCVD || m_tcb->m_ecnState == FlonaseSocketState::ECN_SENDING_ECE)
         {
           SendEmptyPacket (FlonaseHeader::ACK | FlonaseHeader::ECE);
-          NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_SENDING_ECE");
+          // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_SENDING_ECE");
           m_tcb->m_ecnState = FlonaseSocketState::ECN_SENDING_ECE;
         }
       else
@@ -3292,7 +3292,7 @@ FlonaseSocketBase::ReceivedData (Ptr<Packet> p, const FlonaseHeader& flonaseHead
             {
               NS_LOG_DEBUG("Congestion algo " << m_congestionControl->GetName ());
               SendEmptyPacket (FlonaseHeader::ACK | FlonaseHeader::ECE);
-              NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_SENDING_ECE");
+              // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_SENDING_ECE");
               m_tcb->m_ecnState = FlonaseSocketState::ECN_SENDING_ECE;
             }
           else
@@ -3726,7 +3726,7 @@ FlonaseSocketBase::SetRcvBufSize (uint32_t size)
       if (m_tcb->m_ecnState == FlonaseSocketState::ECN_CE_RCVD || m_tcb->m_ecnState == FlonaseSocketState::ECN_SENDING_ECE)
         {
           SendEmptyPacket (FlonaseHeader::ACK | FlonaseHeader::ECE);
-          NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_SENDING_ECE");
+          // NS_LOG_DEBUG (FlonaseSocketState::EcnStateName[m_tcb->m_ecnState] << " -> ECN_SENDING_ECE");
           m_tcb->m_ecnState = FlonaseSocketState::ECN_SENDING_ECE;
         }
       else

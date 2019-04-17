@@ -194,8 +194,8 @@ namespace TracedValueCallback {
    * \param [in] oldValue original value of the traced variable
    * \param [in] newValue new value of the traced variable
    */
-  typedef void (* EcnState)(const TcpSocketState::EcnState_t oldValue,
-                            const TcpSocketState::EcnState_t newValue);
+  // typedef void (* EcnState)(const TcpSocketState::EcnState_t oldValue,
+  //                           const TcpSocketState::EcnState_t newValue);
 
 }  // namespace TracedValueCallback
 
