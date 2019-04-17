@@ -319,6 +319,7 @@ def build(bld):
     headers = bld(features='ns3header')
     headers.module = 'internet'
     headers.source = [
+        'model/sack-helper.h',
         'model/flonase-header.h',
         'model/flonase-l4-protocol.h',
         'model/flonase-socket-factory-impl.h',

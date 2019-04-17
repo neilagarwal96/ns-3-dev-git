@@ -28,6 +28,7 @@
 
 #include "ns3/flonase-option.h"
 #include "ns3/sequence-number.h"
+#include "ns3/sack-helper.h"
 
 namespace ns3 {
 
@@ -56,7 +57,6 @@ public:
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
 
-  typedef std::pair<SequenceNumber32, SequenceNumber32> SackBlock; //!< SACK block definition
   typedef std::list<SackBlock> SackList;                           //!< SACK list definition
 
   FlonaseOptionSack ();
@@ -106,15 +106,6 @@ protected:
  */
 std::ostream & operator<< (std::ostream & os,
                            FlonaseOptionSack const & sackOption);
-
-/**
- * \brief Output operator.
- * \param os The output stream.
- * \param sackBlock the block to print.
- * \returns The output stream.
- */
-std::ostream & operator<< (std::ostream & os,
-                           FlonaseOptionSack::SackBlock const & sackBlock);
 
 } // namespace ns3
 

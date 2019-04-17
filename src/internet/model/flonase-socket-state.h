@@ -111,7 +111,7 @@ public:
     ECN_ECE_RCVD,     /**< Last ACK received had ECE bit set in FLONASE header                                               */
     ECN_CWR_SENT      /**< Sender has reduced the congestion window, and sent a packet with CWR bit set in FLONASE header.
                         *  This state is used for tracing.                                                               */
-  } EcnState_t;
+  } FEcnState_t;
 
   /**
    * \brief Literal names of FLONASE states for use in log messages
@@ -136,7 +136,7 @@ public:
 
   TracedValue<FlonaseCongState_t> m_congState {CA_OPEN}; //!< State in the Congestion state machine
 
-  TracedValue<EcnState_t> m_ecnState {ECN_DISABLED}; //!< Current ECN State, represented as combination of EcnState values
+  TracedValue<FEcnState_t> m_ecnState {ECN_DISABLED}; //!< Current ECN State, represented as combination of EcnState values
 
   TracedValue<SequenceNumber32> m_highTxMark     {0}; //!< Highest seqno ever sent, regardless of ReTx
   TracedValue<SequenceNumber32> m_nextTxSequence {0}; //!< Next seqnum to be sent (SND.NXT), ReTx pushes it back
@@ -189,13 +189,13 @@ namespace TracedValueCallback {
 
    /**
    * \ingroup flonase
-   * TracedValue Callback signature for EcnState_t
+   * TracedValue Callback signature for FEcnState_t
    *
    * \param [in] oldValue original value of the traced variable
    * \param [in] newValue new value of the traced variable
    */
-  typedef void (* EcnState)(const FlonaseSocketState::EcnState_t oldValue,
-                            const FlonaseSocketState::EcnState_t newValue);
+  typedef void (* FEcnState)(const FlonaseSocketState::FEcnState_t oldValue,
+                            const FlonaseSocketState::FEcnState_t newValue);
 
 }  // namespace TracedValueCallback
 

@@ -24,6 +24,7 @@
  */
 
 #include "flonase-option-sack.h"
+#include "ns3/sack-helper.h"
 #include "ns3/log.h"
 
 namespace ns3 {
@@ -166,15 +167,6 @@ operator<< (std::ostream & os, FlonaseOptionSack const & sackOption)
       ss << *it;
     }
   ss << "}";
-  os << ss.str ();
-  return os;
-}
-
-std::ostream &
-operator<< (std::ostream & os, FlonaseOptionSack::SackBlock const & sackBlock)
-{
-  std::stringstream ss;
-  ss << "[" << sackBlock.first << ";" << sackBlock.second << "]";
   os << ss.str ();
   return os;
 }

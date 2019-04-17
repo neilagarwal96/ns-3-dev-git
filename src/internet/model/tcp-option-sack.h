@@ -28,6 +28,8 @@
 
 #include "ns3/tcp-option.h"
 #include "ns3/sequence-number.h"
+#include "ns3/sack-helper.h"
+
 
 namespace ns3 {
 
@@ -56,7 +58,7 @@ public:
   static TypeId GetTypeId (void);
   virtual TypeId GetInstanceTypeId (void) const;
 
-  typedef std::pair<SequenceNumber32, SequenceNumber32> SackBlock; //!< SACK block definition
+  // typedef std::pair<SequenceNumber32, SequenceNumber32> SackBlock; //!< SACK block definition
   typedef std::list<SackBlock> SackList;                           //!< SACK list definition
 
   TcpOptionSack ();
@@ -113,8 +115,8 @@ std::ostream & operator<< (std::ostream & os,
  * \param sackBlock the block to print.
  * \returns The output stream.
  */
-std::ostream & operator<< (std::ostream & os,
-                           TcpOptionSack::SackBlock const & sackBlock);
+// std::ostream & operator<< (std::ostream & os,
+//                            TcpOptionSack::SackBlock const & sackBlock);
 
 } // namespace ns3
 

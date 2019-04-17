@@ -241,7 +241,7 @@ TcpRxBuffer::UpdateSackList (const SequenceNumber32 &head, const SequenceNumber3
   NS_LOG_FUNCTION (this << head << tail);
   NS_ASSERT (head > m_nextRxSeq);
 
-  TcpOptionSack::SackBlock current;
+  SackBlock current;
   current.first = head;
   current.second = tail;
 
@@ -277,8 +277,8 @@ TcpRxBuffer::UpdateSackList (const SequenceNumber32 &head, const SequenceNumber3
   // check if any existing blocks overlap with that.
   bool updated = false;
   TcpOptionSack::SackList::iterator it = m_sackList.begin ();
-  TcpOptionSack::SackBlock begin = *it;
-  TcpOptionSack::SackBlock merged;
+  SackBlock begin = *it;
+  SackBlock merged;
   ++it;
 
   // Iterates until we examined all blocks in the list (maximum 4)
@@ -291,7 +291,7 @@ TcpRxBuffer::UpdateSackList (const SequenceNumber32 &head, const SequenceNumber3
       if (begin.first == current.second)
         {
           NS_ASSERT (current.first < begin.second);
-          merged = TcpOptionSack::SackBlock (current.first, begin.second);
+          merged = SackBlock (current.first, begin.second);
           updated = true;
         }
       // while this is a right merge
@@ -299,7 +299,7 @@ TcpRxBuffer::UpdateSackList (const SequenceNumber32 &head, const SequenceNumber3
       else if (begin.second == current.first)
         {
           NS_ASSERT (begin.first < current.second);
-          merged = TcpOptionSack::SackBlock (begin.first, current.second);
+          merged = SackBlock (begin.first, current.second);
           updated = true;
         }
 
@@ -340,7 +340,7 @@ TcpRxBuffer::ClearSackList (const SequenceNumber32 &seq)
   TcpOptionSack::SackList::iterator it;
   for (it = m_sackList.begin (); it != m_sackList.end (); )
     {
-      TcpOptionSack::SackBlock block = *it;
+      SackBlock block = *it;
       NS_ASSERT (block.first < block.second);
 
       if (block.second <= seq)

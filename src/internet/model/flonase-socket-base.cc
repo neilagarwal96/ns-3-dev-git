@@ -173,7 +173,7 @@ FlonaseSocketBase::GetTypeId (void)
     .AddTraceSource ("EcnState",
                      "Trace ECN state change of socket",
                      MakeTraceSourceAccessor (&FlonaseSocketBase::m_ecnStateTrace),
-                     "ns3::FlonaseSocketState::EcnStatesTracedValueCallback")
+                     "ns3::FlonaseSocketState::FEcnStatesTracedValueCallback")
     .AddTraceSource ("AdvWND",
                      "Advertised Window Size",
                      MakeTraceSourceAccessor (&FlonaseSocketBase::m_advWnd),
@@ -2533,11 +2533,11 @@ FlonaseSocketBase::SendEmptyPacket (uint8_t flags)
 
       if (m_synRetries - 1 == m_synCount)
         {
-          UpdateRttHistory (s, 0, false);
+          UpdateFlonaseRttHistory (s, 0, false);
         }
       else
         { // This is SYN retransmission
-          UpdateRttHistory (s, 0, true);
+          UpdateFlonaseRttHistory (s, 0, true);
         }
 
       windowSize = AdvertisedWindowSize (false);
@@ -2948,7 +2948,7 @@ FlonaseSocketBase::SendDataPacket (SequenceNumber32 seq, uint32_t maxSize, bool 
                     ". Header " << header);
     }
 
-  UpdateRttHistory (seq, sz, isRetransmission);
+  UpdateFlonaseRttHistory (seq, sz, isRetransmission);
 
   // Update bytes sent during recovery phase
   if(m_tcb->m_congState == FlonaseSocketState::CA_RECOVERY)
@@ -2968,7 +2968,7 @@ FlonaseSocketBase::SendDataPacket (SequenceNumber32 seq, uint32_t maxSize, bool 
 }
 
 void
-FlonaseSocketBase::UpdateRttHistory (const SequenceNumber32 &seq, uint32_t sz,
+FlonaseSocketBase::UpdateFlonaseRttHistory (const SequenceNumber32 &seq, uint32_t sz,
                                  bool isRetransmission)
 {
   NS_LOG_FUNCTION (this);
@@ -2976,11 +2976,11 @@ FlonaseSocketBase::UpdateRttHistory (const SequenceNumber32 &seq, uint32_t sz,
   // update the history of sequence numbers used to calculate the RTT
   if (isRetransmission == false)
     { // This is the next expected one, just log at end
-      m_history.push_back (RttHistory (seq, sz, Simulator::Now ()));
+      m_history.push_back (FlonaseRttHistory (seq, sz, Simulator::Now ()));
     }
   else
     { // This is a retransmit, find in list and mark as re-tx
-      for (std::deque<RttHistory>::iterator i = m_history.begin (); i != m_history.end (); ++i)
+      for (std::deque<FlonaseRttHistory>::iterator i = m_history.begin (); i != m_history.end (); ++i)
         {
           if ((seq >= i->seq) && (seq < (i->seq + SequenceNumber32 (i->count))))
             { // Found it
@@ -3328,7 +3328,7 @@ FlonaseSocketBase::EstimateRtt (const FlonaseHeader& flonaseHeader)
   // case the ack'ed packet will be at the head of the list
   if (!m_history.empty ())
     {
-      RttHistory& h = m_history.front ();
+      FlonaseRttHistory& h = m_history.front ();
       if (!h.retx && ackSeq >= (h.seq + SequenceNumber32 (h.count)))
         { // Ok to use this sample
           if (m_timestampEnabled && flonaseHeader.HasOption (FlonaseOption::TS))
@@ -3347,7 +3347,7 @@ FlonaseSocketBase::EstimateRtt (const FlonaseHeader& flonaseHeader)
   // Now delete all ack history with seq <= ack
   while (!m_history.empty ())
     {
-      RttHistory& h = m_history.front ();
+      FlonaseRttHistory& h = m_history.front ();
       if ((h.seq + SequenceNumber32 (h.count)) > ackSeq)
         {
           break;                                                              // Done removing
@@ -4158,8 +4158,8 @@ FlonaseSocketBase::UpdateCongState (FlonaseSocketState::FlonaseCongState_t oldVa
 }
 
  void
-FlonaseSocketBase::UpdateEcnState (FlonaseSocketState::EcnState_t oldValue,
-                                FlonaseSocketState::EcnState_t newValue)
+FlonaseSocketBase::UpdateEcnState (FlonaseSocketState::FEcnState_t oldValue,
+                                FlonaseSocketState::FEcnState_t newValue)
 {
   m_ecnStateTrace (oldValue, newValue);
 }
@@ -4236,8 +4236,8 @@ FlonaseSocketBase::SetEcn (EcnMode_t ecnMode)
   m_ecnMode = ecnMode;
 }
 
-//RttHistory methods
-RttHistory::RttHistory (SequenceNumber32 s, uint32_t c, Time t)
+//FlonaseRttHistory methods
+FlonaseRttHistory::FlonaseRttHistory (SequenceNumber32 s, uint32_t c, Time t)
   : seq (s),
     count (c),
     time (t),
@@ -4245,7 +4245,7 @@ RttHistory::RttHistory (SequenceNumber32 s, uint32_t c, Time t)
 {
 }
 
-RttHistory::RttHistory (const RttHistory& h)
+FlonaseRttHistory::FlonaseRttHistory (const FlonaseRttHistory& h)
   : seq (h.seq),
     count (h.count),
     time (h.time),

@@ -170,13 +170,13 @@ operator<< (std::ostream & os, TcpOptionSack const & sackOption)
   return os;
 }
 
-std::ostream &
-operator<< (std::ostream & os, TcpOptionSack::SackBlock const & sackBlock)
-{
-  std::stringstream ss;
-  ss << "[" << sackBlock.first << ";" << sackBlock.second << "]";
-  os << ss.str ();
-  return os;
-}
+// std::ostream &
+// operator<< (std::ostream & os, TcpOptionSack::SackBlock const & sackBlock)
+// {
+//   std::stringstream ss;
+//   ss << "[" << sackBlock.first << ";" << sackBlock.second << "]";
+//   os << ss.str ();
+//   return os;
+// }
 
 } // namespace ns3

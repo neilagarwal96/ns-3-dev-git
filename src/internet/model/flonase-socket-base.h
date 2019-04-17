@@ -55,21 +55,21 @@ class Ipv6Interface;
  *
  * \brief Helper class to store RTT measurements
  */
-class RttHistory
+class FlonaseRttHistory
 {
 public:
   /**
-   * \brief Constructor - builds an RttHistory with the given parameters
+   * \brief Constructor - builds an FlonaseRttHistory with the given parameters
    * \param s First sequence number in packet sent
    * \param c Number of bytes sent
    * \param t Time this one was sent
    */
-  RttHistory (SequenceNumber32 s, uint32_t c, Time t);
+  FlonaseRttHistory (SequenceNumber32 s, uint32_t c, Time t);
   /**
    * \brief Copy constructor
    * \param h the object to copy
    */
-  RttHistory (const RttHistory& h); // Copy constructor
+  FlonaseRttHistory (const FlonaseRttHistory& h); // Copy constructor
 public:
   SequenceNumber32  seq;  //!< First sequence number in packet sent
   uint32_t        count;  //!< Number of bytes sent
@@ -339,7 +339,7 @@ public:
    /**
    * \brief Callback pointer for ECN state trace chaining
    */
-  TracedCallback<FlonaseSocketState::EcnState_t, FlonaseSocketState::EcnState_t> m_ecnStateTrace;
+  TracedCallback<FlonaseSocketState::FEcnState_t, FlonaseSocketState::FEcnState_t> m_ecnStateTrace;
 
   /**
    * \brief Callback pointer for high tx mark chaining
@@ -395,8 +395,8 @@ public:
    * \param oldValue old ecn state value
    * \param newValue new ecn state value
    */
-  void UpdateEcnState (FlonaseSocketState::EcnState_t oldValue,
-                        FlonaseSocketState::EcnState_t newValue);
+  void UpdateEcnState (FlonaseSocketState::FEcnState_t oldValue,
+                        FlonaseSocketState::FEcnState_t newValue);
 
   /**
    * \brief Callback function to hook to FlonaseSocketState high tx mark
@@ -990,7 +990,7 @@ protected:
    * \param isRetransmission Whether or not the segment is a retransmission
    */
 
-  virtual void UpdateRttHistory (const SequenceNumber32 &seq, uint32_t sz,
+  virtual void UpdateFlonaseRttHistory (const SequenceNumber32 &seq, uint32_t sz,
                                  bool isRetransmission);
 
   /**
@@ -1199,7 +1199,7 @@ protected:
   Time              m_cnTimeout        {Seconds (0.0)};   //!< Timeout for connection retry
 
   // History of RTT
-  std::deque<RttHistory>      m_history;         //!< List of sent packet
+  std::deque<FlonaseRttHistory>      m_history;         //!< List of sent packet
 
   // Connections to other layers of FLONASE/IP
   Ipv4EndPoint*       m_endPoint  {nullptr}; //!< the IPv4 endpoint
@@ -1291,8 +1291,8 @@ typedef void (* FlonaseCongStatesTracedValueCallback)(const FlonaseSocketState::
  * \param [in] oldValue original value of the traced variable
  * \param [in] newValue new value of the traced variable
  */
-typedef void (* EcnStatesTracedValueCallback)(const FlonaseSocketState::EcnState_t oldValue,
-                                                  const FlonaseSocketState::EcnState_t newValue);
+typedef void (* FEcnStatesTracedValueCallback)(const FlonaseSocketState::FEcnState_t oldValue,
+                                                  const FlonaseSocketState::FEcnState_t newValue);
 
 } // namespace ns3
 
