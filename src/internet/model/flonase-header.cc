@@ -98,6 +98,24 @@ FlonaseHeader::SetDestinationPort (uint16_t port)
 }
 
 void
+FlonaseHeader::SetCaravanSize (uint16_t size)
+{
+  m_caravanSize = size;
+}
+
+void
+FlonaseHeader::SetCaravanId (uint16_t id)
+{
+  m_caravanId = id;
+}
+
+void
+FlonaseHeader::SetCaravanBlock (uint16_t block)
+{
+  m_caravanBlock = block;
+}
+
+void
 FlonaseHeader::SetSequenceNumber (SequenceNumber32 sequenceNumber)
 {
   m_sequenceNumber = sequenceNumber;
@@ -138,6 +156,25 @@ FlonaseHeader::GetDestinationPort () const
 {
   return m_destinationPort;
 }
+
+uint16_t
+FlonaseHeader::GetCaravanId () const
+{
+  return m_caravanId;
+}
+
+uint16_t
+FlonaseHeader::GetCaravanBlock () const
+{
+  return m_caravanBlock;
+}
+
+uint16_t
+FlonaseHeader::GetCaravanSize () const
+{
+  return m_caravanSize;
+}
+
 
 SequenceNumber32
 FlonaseHeader::GetSequenceNumber () const
@@ -234,8 +271,6 @@ FlonaseHeader::CalculateHeaderChecksum (uint16_t size) const
   Buffer::Iterator it = buf.Begin ();
   uint32_t hdrSize = 0;
 
-  WriteTo (it, m_source);
-  WriteTo (it, m_destination);
   if (Ipv4Address::IsMatchingType (m_source))
     {
       it.WriteU8 (0); /* protocol */
@@ -295,6 +330,8 @@ FlonaseHeader::Print (std::ostream &os)  const
 
   os << " Seq=" << m_sequenceNumber << " Ack=" << m_ackNumber << " Win=" << m_windowSize;
 
+  os << " CA-ID=" << m_caravanId << " CA-BL=" << m_caravanBlock << " CA-SZ=" << m_caravanSize;
+
   FlonaseOptionList::const_iterator op;
 
   for (op = m_options.begin (); op != m_options.end (); ++op)
@@ -317,6 +354,9 @@ FlonaseHeader::Serialize (Buffer::Iterator start)  const
   Buffer::Iterator i = start;
   i.WriteHtonU16 (m_sourcePort);
   i.WriteHtonU16 (m_destinationPort);
+  i.WriteHtonU16 (m_caravanId);
+  i.WriteHtonU16 (m_caravanBlock);
+  i.WriteHtonU16 (m_caravanSize);
   i.WriteHtonU32 (m_sequenceNumber.GetValue ());
   i.WriteHtonU32 (m_ackNumber.GetValue ());
   i.WriteHtonU16 (GetLength () << 12 | m_flags); //reserved bits are all zero
@@ -363,6 +403,9 @@ FlonaseHeader::Deserialize (Buffer::Iterator start)
   Buffer::Iterator i = start;
   m_sourcePort = i.ReadNtohU16 ();
   m_destinationPort = i.ReadNtohU16 ();
+  m_caravanId = i.ReadNtohU16 ();
+  m_caravanBlock = i.ReadNtohU16 ();
+  m_caravanSize = i.ReadNtohU16 ();
   m_sequenceNumber = i.ReadNtohU32 ();
   m_ackNumber = i.ReadNtohU32 ();
   uint16_t field = i.ReadNtohU16 ();
@@ -444,7 +487,7 @@ FlonaseHeader::Deserialize (Buffer::Iterator start)
 uint8_t
 FlonaseHeader::CalculateHeaderLength () const
 {
-  uint32_t len = 20;
+  uint32_t len = 27; // 20 + 2*3
   FlonaseOptionList::const_iterator i;
 
   for (i = m_options.begin (); i != m_options.end (); ++i)
@@ -456,7 +499,9 @@ FlonaseHeader::CalculateHeaderLength () const
     {
       len += 4 - (len % 4);
     }
+
   return len >> 2;
+
 }
 
 bool
@@ -534,6 +579,10 @@ operator== (const FlonaseHeader &lhs, const FlonaseHeader &rhs)
     && lhs.m_flags           == rhs.m_flags
     && lhs.m_windowSize      == rhs.m_windowSize
     && lhs.m_urgentPointer   == rhs.m_urgentPointer
+    && lhs.m_caravanId       == rhs.m_caravanId
+    && lhs.m_caravanBlock    == rhs.m_caravanBlock
+    && lhs.m_caravanSize     == rhs.m_caravanSize
+
     );
 }
 

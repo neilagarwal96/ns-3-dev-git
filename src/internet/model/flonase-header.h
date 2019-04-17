@@ -96,6 +96,11 @@ public:
    */
   void SetDestinationPort (uint16_t port);
 
+  void SetCaravanId (uint16_t id);
+  void SetCaravanBlock (uint16_t block);
+  void SetCaravanSize (uint16_t size);
+
+
   /**
    * \brief Set the sequence Number
    * \param sequenceNumber the sequence number for this FlonaseHeader
@@ -139,6 +144,11 @@ public:
    * \return the destination port for this FlonaseHeader
    */
   uint16_t GetDestinationPort () const;
+
+  uint16_t GetCaravanId () const;
+  uint16_t GetCaravanBlock () const;
+  uint16_t GetCaravanSize () const;
+
 
   /**
    * \brief Get the sequence number
@@ -343,6 +353,9 @@ private:
 
   Address m_source;       //!< Source IP address
   Address m_destination;  //!< Destination IP address
+  uint16_t m_caravanId;
+  uint16_t m_caravanBlock;
+  uint16_t m_caravanSize;
   uint8_t m_protocol;     //!< Protocol number
 
   bool m_calcChecksum;    //!< Flag to calculate checksum
